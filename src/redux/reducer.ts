@@ -21,7 +21,7 @@ const exampleReducer = (state = initialState, action: {type: string}) => {
 };
 
 const rootReducer = combineReducers({
-  example: exampleReducer,
+  counterReducer: exampleReducer,
 });
 
 export type RootState = ReturnType<typeof rootReducer>;

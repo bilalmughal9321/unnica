@@ -22,7 +22,10 @@ target 'unnica' do
     # An absolute path to your application root.
     :app_path => "#{Pod::Config.instance.installation_root}/.."
   )
-
+  
+  pod 'FirebaseCore', :modular_headers => true;
+  pod 'GoogleUtilities', :modular_headers => true;
+  
   target 'unnicaTests' do
     inherit! :complete
     # Pods for testing

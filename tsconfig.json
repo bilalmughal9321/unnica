@@ -1,3 +1,10 @@
 {
-  "extends": "@react-native/typescript-config/tsconfig.json"
+  "extends": "@react-native/typescript-config/tsconfig.json",
+  "compilerOptions": {
+    "moduleResolution": "node", // Node-style module resolution
+    "resolveJsonModule": true, // Allows importing .json files
+    "esModuleInterop": true, // Allows default imports from CommonJS modules
+    "strict": true, // Enables strict type-checking options
+    "jsx": "react" // Enable React JSX
+  }
 }
