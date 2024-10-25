@@ -18,7 +18,7 @@ interface CreditCardProps {
     cvc?: string;
     type?: string;
   };
-  onCardPress?: () => void;
+  onCardPress: () => void;
 }
 
 const CrediCard: React.FC<CreditCardProps> = ({cardDetails, onCardPress}) => {
