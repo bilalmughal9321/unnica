@@ -96,7 +96,7 @@ const CrediCard: React.FC<CreditCardProps> = ({cardDetails, onCardPress}) => {
               <Text style={styles.cardName}>{cardDetails.name}</Text>
               <View>
                 <Text style={styles.validThruLabel}>VALID THR</Text>
-                <Text style={styles.expiryDate}>12/24</Text>
+                <Text style={styles.expiryDate}>{cardDetails.expiry}</Text>
               </View>
             </View>
           </ImageBackground>
@@ -110,7 +110,7 @@ const CrediCard: React.FC<CreditCardProps> = ({cardDetails, onCardPress}) => {
             style={styles.imageBackground}
             imageStyle={{borderRadius: 10}}>
             <View style={styles.blackStrip} />
-            <Text style={styles.cvc}>123</Text>
+            <Text style={styles.cvc}>{cardDetails.cvc}</Text>
           </ImageBackground>
         </Animated.View>
       </View>

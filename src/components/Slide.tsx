@@ -27,10 +27,11 @@ const SLIDER_SIZE = BUTTON_HEIGHT - 2 * BUTTON_PADDING;
 const SLIDE_RANGE = BUTTON_WIDTH - 2 * BUTTON_PADDING - SLIDER_SIZE;
 
 interface SlideToConfirmProps {
+  isTitle: boolean;
   onConfirm: () => void;
 }
 
-const Slider: React.FC<SlideToConfirmProps> = ({onConfirm}) => {
+const Slider: React.FC<SlideToConfirmProps> = ({onConfirm, isTitle}) => {
   const translateX = useSharedValue(0);
   const [confirmed, setConfirmed] = useState(false);
 
@@ -39,7 +40,7 @@ const Slider: React.FC<SlideToConfirmProps> = ({onConfirm}) => {
     const startHintAnimation = () => {
       translateX.value = withRepeat(
         withTiming(SLIDE_RANGE, {duration: 1000}), // Move slider to the right in 1 second
-        0, // Repeat the animation 2 times
+        2, // Repeat the animation 2 times
         true, // Reverse direction after reaching end
       );
     };
@@ -99,6 +100,12 @@ const Slider: React.FC<SlideToConfirmProps> = ({onConfirm}) => {
   return (
     <GestureHandlerRootView style={{flex: 1}}>
       <View style={styles.container}>
+        {!isTitle ? null : (
+          <Text style={{color: 'white', fontSize: 18, marginBottom: 20}}>
+            Slide to confirm to proceed
+          </Text>
+        )}
+
         <View style={[styles.sliderContainer]}>
           <Animated.Text style={[styles.sliderText, animatedTextStyle]}>
             Slide to Confirm

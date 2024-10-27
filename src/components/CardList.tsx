@@ -1,15 +1,32 @@
 import React from 'react';
-import {View, FlatList, StyleSheet, TouchableOpacity} from 'react-native';
+import {
+  View,
+  FlatList,
+  StyleSheet,
+  TouchableOpacity,
+  ScrollView,
+} from 'react-native';
 import CrediCard from './Card';
 import {useDispatch} from 'react-redux';
+import {formatCardNumber} from '../Utils';
 
-interface cardListProps {}
+interface selectedCard {
+  background: string;
+  number: string;
+  name: string;
+  expiry: string;
+  cvc: string;
+}
+
+interface cardListProps {
+  onClick: (data: selectedCard) => void;
+}
 
 const cardData = [
   {
     id: '1',
     background: 'blue',
-    number: '0000 0000 0000 0001',
+    number: '7818840273917491',
     name: 'Bilal',
     expiry: '12/24',
     cvc: '123',
@@ -17,7 +34,7 @@ const cardData = [
   {
     id: '2',
     background: 'purple',
-    number: '0000 0000 0000 0002',
+    number: '8446909470662329',
     name: 'Ali',
     expiry: '01/25',
     cvc: '456',
@@ -25,14 +42,22 @@ const cardData = [
   {
     id: '3',
     background: 'golden',
-    number: '0000 0000 0000 0003',
+    number: '1859397320943794',
     name: 'Sara',
+    expiry: '11/23',
+    cvc: '789',
+  },
+  {
+    id: '4',
+    background: 'blue',
+    number: '7649668363275262',
+    name: 'Atif',
     expiry: '11/23',
     cvc: '789',
   },
 ];
 
-const CreditCardListScreen: React.FC<cardListProps> = ({}) => {
+const CreditCardListScreen: React.FC<cardListProps> = ({onClick}) => {
   const dispatch = useDispatch();
 
   const handleCardPress = (card: {
@@ -43,38 +68,28 @@ const CreditCardListScreen: React.FC<cardListProps> = ({}) => {
     expiry: string;
     cvc: string;
   }) => {
-    console.log(`Card pressed:`, card);
-
-    dispatch({
-      type: 'SELECTED_CARD',
-      cardDetails: {
-        background: card.background,
-        number: card.number,
-        name: card.name,
-        expiry: card.expiry,
-        cvc: card.cvc,
-      },
-    });
+    onClick(card);
   };
 
   return (
     <View style={styles.container}>
-      {cardData.map(item => {
-        return (
-          <CrediCard
-            key={item.id}
-            cardDetails={{
-              background: item.background,
-              number: item.number,
-              name: item.name,
-              expiry: item.expiry,
-              cvc: item.cvc,
-            }}
-            onCardPress={() => handleCardPress(item)}
-          />
-        );
-      })}
-
+      <ScrollView>
+        {cardData.map(item => {
+          return (
+            <CrediCard
+              key={item.id}
+              cardDetails={{
+                background: item.background,
+                number: formatCardNumber(item.number),
+                name: item.name,
+                expiry: item.expiry,
+                cvc: item.cvc,
+              }}
+              onCardPress={() => handleCardPress(item)}
+            />
+          );
+        })}
+      </ScrollView>
       {/* <FlatList
         data={cardData}
         keyExtractor={item => item.id}

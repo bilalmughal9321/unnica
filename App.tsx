@@ -40,8 +40,10 @@ import CrediCard from './src/components/Card';
 import {formatCardNumber} from './src/Utils';
 import Slider from './src/components/Slide';
 import CreditCardListScreen from './src/components/CardList';
-import SplashScreen from './src/screen/SplashScreen';
 import WelcomeScreen from './src/screen/WelcomeScreen';
+import CardListScreen from './src/screen/CardListScreen';
+import PharmacyScreen from './src/screen/PhaarmacyScreen';
+import SplashScreen from './src/screen/SplashScreen';
 
 type SectionProps = PropsWithChildren<{
   title: string;
@@ -122,6 +124,8 @@ function App(): React.JSX.Element {
       <Stack.Navigator initialRouteName="Splash">
         <Stack.Screen name="Splash" component={SplashScreen} />
         <Stack.Screen name="Welcome" component={WelcomeScreen} />
+        <Stack.Screen name="CardList" component={CardListScreen} />
+        <Stack.Screen name="Pharmacy" component={PharmacyScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
