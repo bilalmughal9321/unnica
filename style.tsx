@@ -1,4 +1,5 @@
 import {StyleSheet} from 'react-native';
+import {Constant} from './src/Utils';
 
 export const styles = StyleSheet.create({
   // Estilos van aquí, sin cambios.
@@ -6,7 +7,7 @@ export const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#fff',
+    backgroundColor: Constant.backgroundColor,
     paddingHorizontal: 5,
     alignContent: 'center',
   },

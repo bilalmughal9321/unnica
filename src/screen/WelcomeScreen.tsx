@@ -1,86 +1,276 @@
-import React, {useEffect, useCallback} from 'react';
-import {useFocusEffect} from '@react-navigation/native';
+import React, {useEffect} from 'react';
 import {StackScreenProps} from '@react-navigation/stack';
-import {Image, Text, TextInput, TouchableOpacity, View} from 'react-native';
-import CreditCardListScreen from '../components/CardList';
-import CrediCard from '../components/Card';
+import {
+  Image,
+  TextInput,
+  TouchableOpacity,
+  View,
+  StyleSheet,
+  Text,
+} from 'react-native';
 import {useSelector} from 'react-redux';
-import {RootState} from '../redux/store';
+
+import CreditCard from '../components/Card';
 import PoweredBy from '../components/PoweredBy';
-import {formatCardNumber} from '../Utils';
-CreditCardListScreen;
+import {Constant, formatCardNumber} from '../Utils';
+import {RootState} from '../redux/store';
+import Topbar from '../components/TopBar';
 
 type WelcomeScreenProps = StackScreenProps<any, 'Welcome'>;
 
 const WelcomeScreen: React.FC<WelcomeScreenProps> = ({navigation}) => {
+  // Access card details from the Redux store
+
   const details = useSelector(
     (state: RootState) => state.cardReducer.cardDetails,
-  ); // State ko access karein
+  );
 
-  useEffect(() => {
-    // console.log('card details: ', details);
-  });
+  useEffect(() => {}, [details]);
 
   const handlePress = () => {
-    // TouchID.authenticate(
-    //   'to demo this react-native component',
-    //   optionalConfigObject,
-    // )
-    //   .then(success => {
-    //     // Alert.alert('Authenticated Successfully');
-    //     navigation.navigate('Pharmacy');
-    //   })
-    //   .catch(error => {});
     navigation.navigate('Pharmacy');
-    // console.log('tap');
   };
 
-  return (
-    <View style={{flex: 1, flexDirection: 'column'}}>
-      <TextInput
-        placeholder="Search..."
-        style={{
-          height: 40,
-          borderColor: '#ccc',
-          borderWidth: 1,
-          borderRadius: 8,
-          paddingHorizontal: 10,
-          marginTop: 20,
-          marginHorizontal: 27,
-        }}
-      />
+  // --------------------------------------------------------------
 
-      <CrediCard
-        cardDetails={{
-          background: details.background == '' ? 'gold' : details.background,
-          number:
-            details.number == ''
-              ? formatCardNumber('0000000000000000')
-              : formatCardNumber(details.number),
-          name: details.name == '' ? 'Bilal' : details.name,
-          expiry: details.expiry == '' ? '25/25' : details.expiry,
-          cvc: details.cvc == '' ? '123' : details.cvc,
-        }}
-        onCardPress={() => navigation.navigate('CardList')}
-      />
+  const TopText = () => {
+    return (
+      <View style={styles.near_accss}>
+        <Text style={styles.near_acess_text}>
+          Place near access touch point to unlock
+        </Text>
+      </View>
+    );
+  };
 
-      <TouchableOpacity onPress={handlePress}>
+  // --------------------------------------------------------------
+
+  const Signal_section = () => {
+    return (
+      <View style={[styles.signal_view]}>
         <Image
-          source={require('./../asset/Scan.png')}
-          style={{
-            width: 350, // Ajusta el ancho de la imagen
-            height: 350, // Ajusta la altura de la imagen
-            resizeMode: 'contain', //Mantiene la relación de aspecto de la imagen
-            marginTop: 30,
-            alignContent: 'center',
-            alignSelf: 'center',
-          }}
+          source={require('../asset/new/Signal.png')}
+          style={styles.signal_image}
         />
-      </TouchableOpacity>
+        <Image
+          source={require('../asset/new/Arrow.png')}
+          style={styles.uploading_img}
+        />
+      </View>
+    );
+  };
 
-      <PoweredBy powerStyles={{position: 'absolute', bottom: 20, right: 10}} />
+  // --------------------------------------------------------------
+
+  const CardView = () => {
+    return (
+      <View style={styles.card_view_vertical}>
+        <View style={[styles.card_view]}>
+          <Image
+            source={require('../asset/left.png')}
+            style={styles.left_img}
+          />
+          <View style={styles.absolute_img}>
+            <Image
+              source={require('../asset/new/visa.png')}
+              style={styles.card_visa_img}
+            />
+
+            <Image
+              source={require('../asset/new/num2.png')}
+              style={styles.card_num_img}
+            />
+
+            <View
+              style={{
+                backgroundColor: Constant.backgroundColor,
+                width: '100%',
+                height: 30,
+                marginTop: 30,
+                zIndex: 10,
+              }}></View>
+
+            <View style={styles.card_customize}>
+              <View style={styles.card_customize_1} />
+              <View style={styles.card_customize_2} />
+            </View>
+          </View>
+          <Image
+            source={require('../asset/right.png')}
+            style={styles.right_img}
+          />
+        </View>
+        <Text style={styles.slideText}>
+          Place near access touch point to unlock
+        </Text>
+      </View>
+    );
+  };
+
+  // --------------------------------------------------------------
+
+  return (
+    <View style={styles.container}>
+      <Topbar />
+      <TopText />
+      <Signal_section />
+      <CardView />
     </View>
   );
 };
+
+// --------------------------------------------------------------
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: Constant.backgroundColor,
+  },
+
+  right_img: {
+    width: '15%',
+    resizeMode: 'contain',
+    marginLeft: 20,
+    tintColor: Constant.themeYellowColor,
+  },
+
+  card_customize: {
+    backgroundColor: 'gray',
+    width: '100%',
+    height: 10,
+    marginTop: 30,
+    flexDirection: 'row',
+  },
+
+  card_customize_1: {
+    backgroundColor: Constant.backgroundColor,
+    width: 30,
+    marginLeft: 30,
+    borderRadius: 20,
+  },
+
+  card_customize_2: {
+    backgroundColor: Constant.backgroundColor,
+    width: 55,
+    marginLeft: 10,
+    borderRadius: 20,
+  },
+
+  left_img: {
+    width: '15%',
+    resizeMode: 'contain',
+    marginLeft: 10,
+    tintColor: Constant.themeYellowColor,
+    marginRight: 20,
+  },
+
+  absolute_img: {
+    width: '65%',
+    height: 130,
+    backgroundColor: 'gray',
+    borderRadius: 20,
+    position: 'relative',
+  },
+
+  card_visa_img: {
+    width: 70,
+    height: 70,
+    position: 'absolute',
+    top: -35,
+    left: -35,
+    zIndex: 11,
+  },
+
+  card_num_img: {
+    width: 100,
+    height: 100,
+    position: 'absolute',
+    right: -40,
+    bottom: -50,
+    zIndex: 11,
+    resizeMode: 'contain',
+  },
+
+  near_accss: {
+    alignSelf: 'center',
+    flexDirection: 'row',
+    marginTop: 30,
+    height: 100,
+    width: '70%',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  near_acess_text: {
+    fontSize: 22,
+    color: 'white',
+    textAlign: 'center',
+    fontWeight: '400',
+  },
+  signal_view: {
+    alignSelf: 'center',
+    flexDirection: 'column',
+    width: '70%',
+    alignItems: 'center',
+  },
+  card_view_vertical: {
+    alignSelf: 'center',
+    flexDirection: 'column',
+    width: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: 200,
+    marginTop: 20,
+  },
+  card_view: {
+    alignSelf: 'center',
+    flexDirection: 'row',
+    width: '80%',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 40,
+    height: 200,
+  },
+  slideText: {
+    fontSize: 17,
+    color: 'white',
+    textAlign: 'center',
+    fontWeight: '400',
+  },
+
+  signal_image: {
+    width: '70%',
+    resizeMode: 'contain',
+    height: 170,
+  },
+  uploading_img: {
+    width: '25%',
+    resizeMode: 'contain',
+    height: 50,
+  },
+  searchInput: {
+    height: 40,
+    borderColor: '#ccc',
+    borderWidth: 1,
+    borderRadius: 8,
+    paddingHorizontal: 30,
+    marginTop: 20,
+    marginHorizontal: 20,
+  },
+  slide_view: {},
+  imageContainer: {
+    alignSelf: 'center',
+    marginTop: 30,
+  },
+  image: {
+    width: 350,
+    height: 350,
+    resizeMode: 'contain',
+  },
+  poweredBy: {
+    position: 'absolute',
+    bottom: 20,
+    right: 10,
+  },
+});
 
 export default WelcomeScreen;

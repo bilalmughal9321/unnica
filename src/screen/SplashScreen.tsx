@@ -1,10 +1,11 @@
 import React from 'react';
-import {View, TouchableOpacity, Image, Alert} from 'react-native';
+import {View, TouchableOpacity, Image, Alert, Text} from 'react-native';
 // import {StatusBar} from 'expo-status-bar';
 import {StackScreenProps} from '@react-navigation/stack';
 import PoweredBy from '../components/PoweredBy';
 import {styles} from '../../style';
 import TouchID from 'react-native-touch-id';
+import {Constant} from '../Utils';
 
 type SplashScreenProps = StackScreenProps<any, 'Splash'>;
 
@@ -36,20 +37,49 @@ const SplashScreen: React.FC<SplashScreenProps> = ({navigation}) => {
     //   });
   };
 
+  const Splash_Image = () => {
+    return (
+      <View
+        style={{
+          alignSelf: 'center',
+          flexDirection: 'column',
+          width: '70%',
+          alignItems: 'center',
+        }}>
+        <Image
+          source={require('../asset/new/Logo.png')}
+          style={{width: '70%', resizeMode: 'contain', height: 200}}
+        />
+        <Text
+          style={{
+            fontSize: 35,
+            color: Constant.themeYellowColor,
+            textAlign: 'center',
+            fontWeight: '700',
+            marginTop: 30,
+            width: '80%',
+          }}>
+          UNNICA
+        </Text>
+
+        <Text
+          style={{
+            fontSize: 22,
+            color: Constant.whiteColor,
+            textAlign: 'center',
+            fontWeight: '700',
+            marginTop: 30,
+            width: '70%',
+          }}>
+          Say hello to a new way of shopping
+        </Text>
+      </View>
+    );
+  };
+
   return (
     <View style={styles.container}>
-      {/* <StatusBar style="auto" /> */}
-      <TouchableOpacity onPress={handlePress}>
-        <Image
-          source={require('../asset/splash2.png')}
-          style={[styles.scanImage, {borderRadius: 20}]}
-        />
-      </TouchableOpacity>
-      {/* <Image
-        source={require('../assets/images/unnica_logo.png')}
-        style={styles.unnicalogo}
-      /> */}
-      <PoweredBy />
+      <Splash_Image />
     </View>
   );
 };

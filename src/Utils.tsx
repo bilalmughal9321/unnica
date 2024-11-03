@@ -10,3 +10,9 @@ export const formatCardNumber = (cardNumber: string): string => {
   // Regular expression to add a space after every 4 digits
   return sanitizedCardNumber.replace(/(.{4})/g, '$1 ').trim();
 };
+
+export const Constant = {
+  backgroundColor: '#1A1A1A',
+  themeYellowColor: '#D6A53D',
+  whiteColor: 'white',
+};
