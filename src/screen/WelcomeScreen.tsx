@@ -7,6 +7,8 @@ import {
   View,
   StyleSheet,
   Text,
+  TouchableNativeFeedback,
+  TouchableHighlight,
 } from 'react-native';
 import {useSelector} from 'react-redux';
 
@@ -48,14 +50,18 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({navigation}) => {
   const Signal_section = () => {
     return (
       <View style={[styles.signal_view]}>
-        <Image
-          source={require('../asset/new/Signal.png')}
-          style={styles.signal_image}
-        />
-        <Image
-          source={require('../asset/new/Arrow.png')}
-          style={styles.uploading_img}
-        />
+        <TouchableOpacity
+          onPress={() => navigation.navigate('Pharmacy')}
+          style={styles.signal_view_touch}>
+          <Image
+            source={require('../asset/new/Signal.png')}
+            style={styles.signal_image}
+          />
+          <Image
+            source={require('../asset/new/Arrow.png')}
+            style={styles.uploading_img}
+          />
+        </TouchableOpacity>
       </View>
     );
   };
@@ -111,7 +117,7 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({navigation}) => {
 
   return (
     <View style={styles.container}>
-      <Topbar />
+      <Topbar isTitle={false} />
       <TopText />
       <Signal_section />
       <CardView />
@@ -207,6 +213,13 @@ const styles = StyleSheet.create({
     fontWeight: '400',
   },
   signal_view: {
+    alignSelf: 'center',
+    flexDirection: 'column',
+    width: '100%',
+    alignItems: 'center',
+  },
+
+  signal_view_touch: {
     alignSelf: 'center',
     flexDirection: 'column',
     width: '70%',

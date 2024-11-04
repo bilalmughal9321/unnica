@@ -3,11 +3,18 @@ import {View, Image, StyleSheet, ViewStyle} from 'react-native';
 
 interface TopBarProps {
   topBarStyle?: ViewStyle;
+  isTitle: Boolean;
 }
 
-const Topbar: React.FC<TopBarProps> = ({topBarStyle}) => (
+const Topbar: React.FC<TopBarProps> = ({topBarStyle, isTitle}) => (
   <View style={[styles.container, topBarStyle]}>
     <Image source={require('../asset/new/Logo.png')} style={styles.logo} />
+    {isTitle ? (
+      <Image
+        source={require('../asset/new/Store.png')}
+        style={styles.centerLogo}
+      />
+    ) : null}
     <Image source={require('../asset/new/Menu.png')} style={styles.menuIcon} />
   </View>
 );
@@ -31,6 +38,13 @@ const styles = StyleSheet.create({
     width: '20%',
     height: 55,
     resizeMode: 'contain',
+  },
+  centerLogo: {
+    alignSelf: 'center',
+    width: '40%',
+    height: 60,
+    borderRadius: 30,
+    // resizeMode: 'contain',
   },
   menuIcon: {
     alignSelf: 'center',

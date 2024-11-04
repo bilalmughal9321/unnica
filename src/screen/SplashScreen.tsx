@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {View, TouchableOpacity, Image, Alert, Text} from 'react-native';
 // import {StatusBar} from 'expo-status-bar';
 import {StackScreenProps} from '@react-navigation/stack';
@@ -21,6 +21,15 @@ const SplashScreen: React.FC<SplashScreenProps> = ({navigation}) => {
     unifiedErrors: false, // use unified error messages (default false)
     passcodeFallback: false, // iOS - allows the device to fall back to using the passcode, if faceid/touch is not available. this does not mean that if touchid/faceid fails the first few times it will revert to passcode, rather that if the former are not enrolled, then it will use the passcode.
   };
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      navigation.navigate('Welcome');
+    }, 2000);
+
+    // Clear timeout on component unmount
+    return () => clearTimeout(timer);
+  }, []);
 
   const handlePress = () => {
     navigation.navigate('Welcome');
@@ -50,6 +59,7 @@ const SplashScreen: React.FC<SplashScreenProps> = ({navigation}) => {
           source={require('../asset/new/Logo.png')}
           style={{width: '70%', resizeMode: 'contain', height: 200}}
         />
+
         <Text
           style={{
             fontSize: 35,
