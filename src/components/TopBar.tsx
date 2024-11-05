@@ -1,12 +1,21 @@
 import React from 'react';
-import {View, Image, StyleSheet, ViewStyle} from 'react-native';
+import {
+  View,
+  Image,
+  StyleSheet,
+  ViewStyle,
+  Touchable,
+  TouchableOpacity,
+} from 'react-native';
+import {NavigationProp} from '@react-navigation/native';
 
 interface TopBarProps {
   topBarStyle?: ViewStyle;
   isTitle: Boolean;
+  openDrawer: () => void;
 }
 
-const Topbar: React.FC<TopBarProps> = ({topBarStyle, isTitle}) => (
+const Topbar: React.FC<TopBarProps> = ({topBarStyle, isTitle, openDrawer}) => (
   <View style={[styles.container, topBarStyle]}>
     <Image source={require('../asset/new/Logo.png')} style={styles.logo} />
     {isTitle ? (
@@ -15,7 +24,12 @@ const Topbar: React.FC<TopBarProps> = ({topBarStyle, isTitle}) => (
         style={styles.centerLogo}
       />
     ) : null}
-    <Image source={require('../asset/new/Menu.png')} style={styles.menuIcon} />
+    <TouchableOpacity onPress={openDrawer} style={styles.menuIconTouchable}>
+      <Image
+        source={require('../asset/new/Menu.png')}
+        style={styles.menuIcon}
+      />
+    </TouchableOpacity>
   </View>
 );
 
@@ -29,8 +43,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     shadowColor: 'black',
     shadowOffset: {width: 0, height: 10},
-    shadowOpacity: 0.3,
-    shadowRadius: 2,
+    shadowRadius: 5,
+    shadowOpacity: 0.5,
     elevation: 15,
   },
   logo: {
@@ -46,9 +60,15 @@ const styles = StyleSheet.create({
     borderRadius: 30,
     // resizeMode: 'contain',
   },
-  menuIcon: {
+  menuIconTouchable: {
     alignSelf: 'center',
     width: '20%',
+    height: 25,
+    resizeMode: 'contain',
+  },
+  menuIcon: {
+    alignSelf: 'center',
+    width: '40%',
     height: 25,
     resizeMode: 'contain',
   },

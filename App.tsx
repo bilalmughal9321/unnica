@@ -32,6 +32,7 @@ import {
 } from 'react-native/Libraries/NewAppScreen';
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
+import {createDrawerNavigator} from '@react-navigation/drawer';
 
 import {useSelector, useDispatch} from 'react-redux';
 import {RootState} from './src/redux/reducer'; // RootState import karein
@@ -51,6 +52,7 @@ type SectionProps = PropsWithChildren<{
 
 function App(): React.JSX.Element {
   const Stack = createStackNavigator();
+  const Drawer = createDrawerNavigator();
 
   const isDarkMode = useColorScheme() === 'dark';
 
@@ -98,34 +100,55 @@ function App(): React.JSX.Element {
     console.log(`Card with ID ${cardId} pressed`);
   };
 
+  const DrawerNavigator = () => {
+    return (
+      <Drawer.Navigator initialRouteName="About">
+        <Drawer.Screen name="About" component={AboutScreen} />
+        <Drawer.Screen name="Contact Us" component={ContactUsScreen} />
+      </Drawer.Navigator>
+    );
+  };
+
+  const AboutScreen = () => {
+    return (
+      <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+        <Text>About Us</Text>
+      </View>
+    );
+  };
+
+  const ContactUsScreen = () => {
+    return (
+      <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+        <Text>Contact Us</Text>
+      </View>
+    );
+  };
+
   return (
-    // <SafeAreaView style={backgroundStyle}>
-    //   {/* <CreditCardListScreen /> */}
-
-    //   <FlatList
-    //     data={cardData}
-    //     keyExtractor={item => item.id}
-    //     renderItem={({item}) => (
-    //       <CrediCard
-    //         cardDetails={{
-    //           background: item.background,
-    //           number: item.number,
-    //           name: item.name,
-    //           expiry: item.expiry,
-    //           cvc: item.cvc,
-    //         }}
-    //         onCardPress={() => handleCardPress(item.id)}
-    //       />
-    //     )}
-    //   />
-    // </SafeAreaView>
-
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Splash">
-        <Stack.Screen name="Splash" component={SplashScreen} />
-        <Stack.Screen name="Welcome" component={WelcomeScreen} />
-        <Stack.Screen name="CardList" component={CardListScreen} />
-        <Stack.Screen name="Pharmacy" component={PharmacyScreen} />
+        <Stack.Screen
+          name="Splash"
+          component={SplashScreen}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name="Welcome"
+          component={WelcomeScreen}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name="CardList"
+          component={CardListScreen}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name="Pharmacy"
+          component={PharmacyScreen}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen name="Drawer" component={DrawerNavigator} />
       </Stack.Navigator>
     </NavigationContainer>
   );

@@ -11,10 +11,12 @@ import {
   Easing,
   ScrollView,
   Alert,
+  Platform,
+  Dimensions,
 } from 'react-native';
 // import IconBadge from 'react-native-icon-badge';
 // import FooterBack from '../components/FooterBack';
-import {StackScreenProps} from '@react-navigation/stack';
+import {StackScreenProps, StackNavigationProp} from '@react-navigation/stack';
 import {styles} from '../../style';
 import CreditCard from '../components/Card';
 import SlideToConfirm from '../components/Slide';
@@ -27,9 +29,12 @@ import {RootState} from '../redux/store';
 import Topbar from '../components/TopBar';
 import CountdownCircle from '../components/CountdownCircle';
 
-type PharmacyScreenProps = StackScreenProps<any, 'Pharmacy'>;
+// type PharmacyScreenProps = StackScreenProps<any, 'Pharmacy'>;
+type SecondScreenProps = {
+  navigation: StackNavigationProp<any>;
+};
 
-const PharmacyScreen: React.FC<PharmacyScreenProps> = ({navigation}) => {
+const PharmacyScreen: React.FC<SecondScreenProps> = ({navigation}) => {
   const [seconds, setSeconds] = useState<number>(0);
   const [isConfirmed, setIsConfirmed] = useState<boolean>(false);
   const [isFirstTime, setIsFirstTime] = useState<boolean>(true);
@@ -44,6 +49,7 @@ const PharmacyScreen: React.FC<PharmacyScreenProps> = ({navigation}) => {
     (state: RootState) => state.cardReducer.cardDetails,
   ); // State ko access karein
   const dispatch = useDispatch();
+  const {height, width} = Dimensions.get('window');
 
   useEffect(() => {
     // Timer will run in the background
@@ -88,6 +94,17 @@ const PharmacyScreen: React.FC<PharmacyScreenProps> = ({navigation}) => {
 
   // --------------------------------------------------------------
 
+  const hasNotch = () => {
+    const aspectRatio = height / width;
+
+    return (
+      Platform.OS === 'ios' &&
+      (aspectRatio > 2.1 || (width >= 375 && height >= 812))
+    );
+  };
+
+  // --------------------------------------------------------------
+
   const HandShakeImage = () => {
     return (
       <Image
@@ -122,6 +139,11 @@ const PharmacyScreen: React.FC<PharmacyScreenProps> = ({navigation}) => {
 
   // --------------------------------------------------------------
 
+  const normalize = (size: number) => {
+    const scale = width / 375;
+    return size * scale;
+  };
+
   const BottomBar = () => {
     return (
       <View
@@ -132,14 +154,15 @@ const PharmacyScreen: React.FC<PharmacyScreenProps> = ({navigation}) => {
           bottom: 0, // Positioning at the bottom
           left: 0,
           right: 0,
+          // iOS shadow properties
           shadowColor: 'black',
           shadowOffset: {width: 0, height: -10},
           shadowRadius: 5,
           shadowOpacity: 0.5,
-          // justifyContent: 'center',
+          // Android elevation property
+          elevation: 5, // Adjust this value for more or less shadow
           alignItems: 'center',
           flexDirection: 'row',
-          flex: 1,
         }}>
         <Image
           source={require('../asset/new/Addeditem.png')}
@@ -156,7 +179,7 @@ const PharmacyScreen: React.FC<PharmacyScreenProps> = ({navigation}) => {
           style={{
             color: 'white',
             fontWeight: '600',
-            fontSize: 25,
+            fontSize: normalize(20),
             flex: 4.5,
             // backgroundColor: 'red',
             left: 20,
@@ -168,7 +191,7 @@ const PharmacyScreen: React.FC<PharmacyScreenProps> = ({navigation}) => {
           style={{
             color: 'white',
             fontWeight: '400',
-            fontSize: 35,
+            fontSize: normalize(25),
             flex: 4.5,
             textAlign: 'right',
             marginRight: 30,
@@ -204,7 +227,13 @@ const PharmacyScreen: React.FC<PharmacyScreenProps> = ({navigation}) => {
         flexDirection: 'column',
         backgroundColor: Constant.backgroundColor,
       }}>
-      <Topbar isTitle={true} />
+      <Topbar
+        isTitle={true}
+        topBarStyle={{marginTop: hasNotch() ? 45 : 0}}
+        openDrawer={() => {
+          console.log('asdas');
+        }}
+      />
       <HandShakeImage />
       <TopText />
       <ContentView />
