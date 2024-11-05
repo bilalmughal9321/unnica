@@ -14,13 +14,13 @@ import {useSelector} from 'react-redux';
 
 import CreditCard from '../components/Card';
 import PoweredBy from '../components/PoweredBy';
-import {Constant, formatCardNumber, hasNotch} from '../Utils';
+import {Constant, formatCardNumber, hasNotch, normalize} from '../Utils';
 import {RootState} from '../redux/store';
 import Topbar from '../components/TopBar';
 
-type WelcomeScreenProps = StackScreenProps<any, 'Welcome'>;
+type CartScreenProps = StackScreenProps<any, 'Cart'>;
 
-const WelcomeScreen: React.FC<WelcomeScreenProps> = ({navigation}) => {
+const CartScreen: React.FC<CartScreenProps> = ({navigation}) => {
   // Access card details from the Redux store
 
   const details = useSelector(
@@ -35,12 +35,35 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({navigation}) => {
 
   // --------------------------------------------------------------
 
-  const TopText = () => {
+  interface TopTextProps {
+    text: string;
+    price: string;
+  }
+
+  const TopText: React.FC<TopTextProps> = ({text, price}) => {
     return (
-      <View style={styles.near_accss}>
-        <Text style={styles.near_acess_text}>
-          Place near access touch point to unlock
+      <View style={[styles.near_accss, {marginTop: 0}]}>
+        <Text
+          style={[styles.near_acess_text, {fontSize: 17, fontWeight: '700'}]}>
+          {text}
         </Text>
+        <Text style={styles.near_acess_text}>${price}</Text>
+      </View>
+    );
+  };
+
+  const TopText2: React.FC<TopTextProps> = ({text, price}) => {
+    return (
+      <View
+        style={[
+          styles.near_accss,
+          {backgroundColor: Constant.backgroundColor, height: 60, marginTop: 0},
+        ]}>
+        <Text
+          style={[styles.near_acess_text, {fontSize: 17, fontWeight: '700'}]}>
+          {text}
+        </Text>
+        <Text style={styles.near_acess_text}>${price}</Text>
       </View>
     );
   };
@@ -115,12 +138,80 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({navigation}) => {
 
   // --------------------------------------------------------------
 
+  interface bottomBarProps {
+    price: string;
+  }
+
+  const BottomBar: React.FC<bottomBarProps> = ({price}) => {
+    return (
+      <TouchableOpacity
+        onPress={() => navigation.navigate('Cart')}
+        style={{
+          height: 90,
+          backgroundColor: Constant.backgroundColor, // Change this color as needed
+          position: 'absolute',
+          bottom: 0, // Positioning at the bottom
+          left: 0,
+          right: 0,
+          // iOS shadow properties
+          shadowColor: 'black',
+          shadowOffset: {width: 0, height: -10},
+          shadowRadius: 5,
+          shadowOpacity: 0.5,
+          // Android elevation property
+          elevation: 5, // Adjust this value for more or less shadow
+          alignItems: 'center',
+          flexDirection: 'row',
+        }}>
+        <Image
+          source={require('../asset/new/Addeditem.png')}
+          style={{
+            height: 55,
+            padding: 0,
+            marginLeft: 30,
+            flex: 1.4,
+            resizeMode: 'contain',
+          }}
+        />
+
+        <Text
+          style={{
+            color: 'white',
+            fontWeight: '600',
+            fontSize: normalize(20),
+            flex: 4.5,
+            // backgroundColor: 'red',
+            left: 20,
+          }}>
+          Your balance
+        </Text>
+
+        <Text
+          style={{
+            color: 'white',
+            fontWeight: '400',
+            fontSize: normalize(25),
+            flex: 4.5,
+            textAlign: 'right',
+            marginRight: 30,
+            // backgroundColor: 'red',
+          }}>
+          ${price}
+        </Text>
+      </TouchableOpacity>
+    );
+  };
+
   return (
     <View style={styles.container}>
       <Topbar isTitle={false} topBarStyle={{marginTop: hasNotch() ? 40 : 0}} />
-      <TopText />
-      <Signal_section />
-      <CardView />
+      <TopText text="Thoothpaste mini" price="2.40" />
+      <TopText2 text="Cleaning face mask" price="4.40" />
+      <TopText text="Shampoo Tio Nacho" price="5.40" />
+      {/* <Signal_section />
+      <CardView /> */}
+
+      <BottomBar price="11.20" />
     </View>
   );
 };
@@ -200,17 +291,20 @@ const styles = StyleSheet.create({
   near_accss: {
     alignSelf: 'center',
     flexDirection: 'row',
-    marginTop: 30,
-    height: 100,
-    width: '70%',
-    justifyContent: 'center',
+    marginTop: 20,
+    height: 60,
+    width: '100%',
+    justifyContent: 'space-around',
     alignItems: 'center',
+    backgroundColor: '#333333',
   },
   near_acess_text: {
-    fontSize: 22,
+    fontSize: 15,
     color: 'white',
     textAlign: 'center',
     fontWeight: '400',
+    // marginLeft: 10,
+    // width: '90%',
   },
   signal_view: {
     alignSelf: 'center',
@@ -286,4 +380,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default WelcomeScreen;
+export default CartScreen;

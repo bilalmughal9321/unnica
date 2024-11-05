@@ -23,7 +23,7 @@ import SlideToConfirm from '../components/Slide';
 import ImageWithBadge from '../components/ImageBadge';
 import {CountdownCircleTimer} from 'react-native-countdown-circle-timer';
 import CountdownTimer from '../components/CountTimer';
-import {Constant, formatCardNumber} from '../Utils';
+import {Constant, formatCardNumber, hasNotch, normalize} from '../Utils';
 import {useDispatch, useSelector} from 'react-redux';
 import {RootState} from '../redux/store';
 import Topbar from '../components/TopBar';
@@ -49,7 +49,6 @@ const PharmacyScreen: React.FC<SecondScreenProps> = ({navigation}) => {
     (state: RootState) => state.cardReducer.cardDetails,
   ); // State ko access karein
   const dispatch = useDispatch();
-  const {height, width} = Dimensions.get('window');
 
   useEffect(() => {
     // Timer will run in the background
@@ -94,14 +93,15 @@ const PharmacyScreen: React.FC<SecondScreenProps> = ({navigation}) => {
 
   // --------------------------------------------------------------
 
-  const hasNotch = () => {
-    const aspectRatio = height / width;
+  // const hasNotch = () => {
+  //   const {height, width} = Dimensions.get('window');
+  //   const aspectRatio = height / width;
 
-    return (
-      Platform.OS === 'ios' &&
-      (aspectRatio > 2.1 || (width >= 375 && height >= 812))
-    );
-  };
+  //   return (
+  //     Platform.OS === 'ios' &&
+  //     (aspectRatio > 2.1 || (width >= 375 && height >= 812))
+  //   );
+  // };
 
   // --------------------------------------------------------------
 
@@ -139,14 +139,10 @@ const PharmacyScreen: React.FC<SecondScreenProps> = ({navigation}) => {
 
   // --------------------------------------------------------------
 
-  const normalize = (size: number) => {
-    const scale = width / 375;
-    return size * scale;
-  };
-
   const BottomBar = () => {
     return (
-      <View
+      <TouchableOpacity
+        onPress={() => navigation.navigate('Cart')}
         style={{
           height: 90,
           backgroundColor: Constant.backgroundColor, // Change this color as needed
@@ -199,7 +195,7 @@ const PharmacyScreen: React.FC<SecondScreenProps> = ({navigation}) => {
           }}>
           $0,00
         </Text>
-      </View>
+      </TouchableOpacity>
     );
   };
 

@@ -45,6 +45,7 @@ import WelcomeScreen from './src/screen/WelcomeScreen';
 import CardListScreen from './src/screen/CardListScreen';
 import PharmacyScreen from './src/screen/PhaarmacyScreen';
 import SplashScreen from './src/screen/SplashScreen';
+import CartScreen from './src/screen/CartListScreen';
 
 type SectionProps = PropsWithChildren<{
   title: string;
@@ -146,6 +147,11 @@ function App(): React.JSX.Element {
         <Stack.Screen
           name="Pharmacy"
           component={PharmacyScreen}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name="Cart"
+          component={CartScreen}
           options={{headerShown: false}}
         />
         <Stack.Screen name="Drawer" component={DrawerNavigator} />

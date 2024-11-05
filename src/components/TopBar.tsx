@@ -12,7 +12,7 @@ import {NavigationProp} from '@react-navigation/native';
 interface TopBarProps {
   topBarStyle?: ViewStyle;
   isTitle: Boolean;
-  openDrawer: () => void;
+  openDrawer?: () => void;
 }
 
 const Topbar: React.FC<TopBarProps> = ({topBarStyle, isTitle, openDrawer}) => (
