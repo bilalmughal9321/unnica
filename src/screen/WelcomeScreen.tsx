@@ -17,6 +17,7 @@ import PoweredBy from '../components/PoweredBy';
 import {Constant, formatCardNumber, hasNotch} from '../Utils';
 import {RootState} from '../redux/store';
 import Topbar from '../components/TopBar';
+import NFCFiled from './NFCFiled';
 
 type WelcomeScreenProps = StackScreenProps<any, 'Welcome'>;
 
@@ -117,10 +118,12 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({navigation}) => {
 
   return (
     <View style={styles.container}>
-      <Topbar isTitle={false} topBarStyle={{marginTop: hasNotch() ? 40 : 0}} />
+      {/* <Topbar isTitle={false} topBarStyle={{marginTop: hasNotch() ? 40 : 0}} />
       <TopText />
       <Signal_section />
-      <CardView />
+      <CardView /> */}
+
+      <NFCFiled />
     </View>
   );
 };
