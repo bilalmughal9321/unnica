@@ -18,6 +18,7 @@ import {Constant, formatCardNumber, hasNotch} from '../Utils';
 import {RootState} from '../redux/store';
 import Topbar from '../components/TopBar';
 import NFCFiled from './NFCFiled';
+import NfcManager, {NfcTech} from 'react-native-nfc-manager';
 
 type WelcomeScreenProps = StackScreenProps<any, 'Welcome'>;
 
@@ -33,6 +34,22 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({navigation}) => {
   const handlePress = () => {
     navigation.navigate('Pharmacy');
   };
+
+  async function readNdef() {
+    try {
+      // register for the NFC tag with NDEF in it
+      await NfcManager.requestTechnology(NfcTech.Ndef);
+      // the resolved tag object will contain `ndefMessage` property
+      const tag = await NfcManager.getTag();
+      console.warn('Tag found', tag);
+      navigation.navigate('Pharmacy');
+    } catch (ex) {
+      console.warn('Oops!', ex);
+    } finally {
+      // stop the nfc scanning
+      NfcManager.cancelTechnologyRequest();
+    }
+  }
 
   // --------------------------------------------------------------
 
@@ -52,7 +69,7 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({navigation}) => {
     return (
       <View style={[styles.signal_view]}>
         <TouchableOpacity
-          onPress={() => navigation.navigate('Pharmacy')}
+          onPress={() => readNdef()}
           style={styles.signal_view_touch}>
           <Image
             source={require('../asset/new/Signal.png')}
@@ -118,12 +135,12 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({navigation}) => {
 
   return (
     <View style={styles.container}>
-      {/* <Topbar isTitle={false} topBarStyle={{marginTop: hasNotch() ? 40 : 0}} />
+      <Topbar isTitle={false} topBarStyle={{marginTop: hasNotch() ? 40 : 0}} />
       <TopText />
       <Signal_section />
-      <CardView /> */}
+      <CardView />
 
-      <NFCFiled />
+      {/* <NFCFiled /> */}
     </View>
   );
 };
