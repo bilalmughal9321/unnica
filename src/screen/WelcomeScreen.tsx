@@ -36,19 +36,20 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({navigation}) => {
   };
 
   async function readNdef() {
-    try {
-      // register for the NFC tag with NDEF in it
-      await NfcManager.requestTechnology(NfcTech.Ndef);
-      // the resolved tag object will contain `ndefMessage` property
-      const tag = await NfcManager.getTag();
-      console.warn('Tag found', tag);
-      navigation.navigate('Pharmacy');
-    } catch (ex) {
-      console.warn('Oops!', ex);
-    } finally {
-      // stop the nfc scanning
-      NfcManager.cancelTechnologyRequest();
-    }
+    navigation.navigate('Pharmacy');
+    // try {
+    //   // register for the NFC tag with NDEF in it
+    //   await NfcManager.requestTechnology(NfcTech.Ndef);
+    //   // the resolved tag object will contain `ndefMessage` property
+    //   const tag = await NfcManager.getTag();
+    //   console.warn('Tag found', tag);
+    //   navigation.navigate('Pharmacy');
+    // } catch (ex) {
+    //   console.warn('Oops!', ex);
+    // } finally {
+    //   // stop the nfc scanning
+    //   NfcManager.cancelTechnologyRequest();
+    // }
   }
 
   // --------------------------------------------------------------
@@ -124,9 +125,7 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({navigation}) => {
             style={styles.right_img}
           />
         </View>
-        <Text style={styles.slideText}>
-          Place near access touch point to unlock
-        </Text>
+        <Text style={styles.slideText}>Slide to change payment method</Text>
       </View>
     );
   };

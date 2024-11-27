@@ -28,11 +28,14 @@ import {useDispatch, useSelector} from 'react-redux';
 import {RootState} from '../redux/store';
 import Topbar from '../components/TopBar';
 import CountdownCircle from '../components/CountdownCircle';
+import SocketService from '../components/SocketService';
 
 // type PharmacyScreenProps = StackScreenProps<any, 'Pharmacy'>;
 type SecondScreenProps = {
   navigation: StackNavigationProp<any>;
 };
+
+const socketUrl = 'ws://api.ci.unnica-dev.co/ws';
 
 const PharmacyScreen: React.FC<SecondScreenProps> = ({navigation}) => {
   const [seconds, setSeconds] = useState<number>(0);
@@ -45,27 +48,57 @@ const PharmacyScreen: React.FC<SecondScreenProps> = ({navigation}) => {
   const heightAnim = useRef(new Animated.Value(200)).current; // Initial height
   const arrowRotation = useRef(new Animated.Value(0)).current; // To rotate arrow icon
 
+  // ------------------------------------------------------------------------------------
+
+  const [message, setMessage] = useState('');
+  const [receivedMessages, setReceivedMessages] = useState<string[]>([]);
+  const socketService = new SocketService(socketUrl);
+
+  // ------------------------------------------------------------------------------------
+
   const details = useSelector(
     (state: RootState) => state.cardReducer.cardDetails,
   ); // State ko access karein
   const dispatch = useDispatch();
 
+  let interval: NodeJS.Timeout | null = null;
+
   useEffect(() => {
     // Timer will run in the background
-    let interval: NodeJS.Timeout | null = null;
+    // TimeOutinit();
+
+    socketService.connect(
+      '1JqmHZeCjywJf4xlKrLmdDYshnNaOspmsEMWchesB8fp2bdxq5yOf8WKPNZf8R0A',
+      data => {
+        setReceivedMessages(prevMessages => [...prevMessages, data.message]);
+      },
+    );
+
+    Alert.alert('asdasd');
+
+    return () => {
+      socketService.close();
+    };
+
+    return () => {
+      clearTimer();
+    };
+  }, [remainingTime]);
+
+  const TimeOutinit = () => {
     if (remainingTime < 120) {
       console.log('remainingTime: ', remainingTime);
       interval = setInterval(() => {
         setRemainingTime(prev => prev + 1); // Decrease time every second
       }, 1000);
     }
+  };
 
-    return () => {
-      if (interval) {
-        clearInterval(interval); // Clean up the interval on component unmount
-      }
-    };
-  }, [remainingTime]);
+  const clearTimer = () => {
+    if (interval) {
+      clearInterval(interval); // Clean up the interval on component unmount
+    }
+  };
 
   const handleConfirm = () => {
     // Confirmation handler
@@ -234,7 +267,7 @@ const PharmacyScreen: React.FC<SecondScreenProps> = ({navigation}) => {
       <TopText />
       <ContentView />
       <CountdownTimer
-        duration={200}
+        duration={120}
         onComplete={() => {
           Alert.alert('Timer completed!');
         }}
