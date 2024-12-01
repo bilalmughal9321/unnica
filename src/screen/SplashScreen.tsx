@@ -25,7 +25,7 @@ const SplashScreen: React.FC<SplashScreenProps> = ({navigation}) => {
   useEffect(() => {
     const timer = setTimeout(() => {
       navigation.navigate('Welcome');
-    }, 7000);
+    }, 1000);
 
     // Clear timeout on component unmount
     return () => clearTimeout(timer);

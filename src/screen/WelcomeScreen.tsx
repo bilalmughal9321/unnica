@@ -9,8 +9,9 @@ import {
   Text,
   TouchableNativeFeedback,
   TouchableHighlight,
+  ActivityIndicator,
 } from 'react-native';
-import {useSelector} from 'react-redux';
+import {useSelector, useDispatch} from 'react-redux';
 
 import CreditCard from '../components/Card';
 import PoweredBy from '../components/PoweredBy';
@@ -19,17 +20,26 @@ import {RootState} from '../redux/store';
 import Topbar from '../components/TopBar';
 import NFCFiled from './NFCFiled';
 import NfcManager, {NfcTech} from 'react-native-nfc-manager';
+import {fetchNFCSec} from '../Api/NetworkManager';
+import {useAppDispatch, useAppSelector} from '../hooks/reduxHooks';
 
 type WelcomeScreenProps = StackScreenProps<any, 'Welcome'>;
 
 const WelcomeScreen: React.FC<WelcomeScreenProps> = ({navigation}) => {
-  // Access card details from the Redux store
-
-  const details = useSelector(
-    (state: RootState) => state.cardReducer.cardDetails,
+  // const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
+  const {loading, error, response} = useSelector(
+    (state: RootState) => state.ApiReducer,
   );
 
-  useEffect(() => {}, [details]);
+  useEffect(() => {
+    // console.log('aabsdjhabsd');
+    // dispatch(fetchNFCSec());
+  }, []);
+
+  useEffect(() => {
+    console.log('loading: ', loading);
+  }, [loading]);
 
   const handlePress = () => {
     navigation.navigate('Pharmacy');
@@ -54,6 +64,18 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({navigation}) => {
 
   // --------------------------------------------------------------
 
+  const loadingFunc = () => {
+    if (loading) {
+      return (
+        <View style={styles.overlay}>
+          <ActivityIndicator size="large" color="white" />
+        </View>
+      );
+    }
+  };
+
+  // --------------------------------------------------------------
+
   const TopText = () => {
     return (
       <View style={styles.near_accss}>
@@ -70,7 +92,8 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({navigation}) => {
     return (
       <View style={[styles.signal_view]}>
         <TouchableOpacity
-          onPress={() => readNdef()}
+          // onPress={() => readNdef()}
+          onPress={() => dispatch(fetchNFCSec())}
           style={styles.signal_view_touch}>
           <Image
             source={require('../asset/new/Signal.png')}
@@ -134,8 +157,12 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({navigation}) => {
 
   return (
     <View style={styles.container}>
+      {loading && loadingFunc()}
       <Topbar isTitle={false} topBarStyle={{marginTop: hasNotch() ? 40 : 0}} />
       <TopText />
+      <Text style={{color: 'white', fontWeight: '600'}}>
+        asfasf {loading ? 'true' : 'false'}
+      </Text>
       <Signal_section />
       <CardView />
 
@@ -152,6 +179,17 @@ const styles = StyleSheet.create({
     backgroundColor: Constant.backgroundColor,
   },
 
+  overlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Semi-transparent background
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 999, // Ensure the overlay is on top of other components
+  },
   right_img: {
     width: '15%',
     resizeMode: 'contain',

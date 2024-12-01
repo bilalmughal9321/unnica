@@ -44,6 +44,55 @@ const cardInitialState: CardState = {
   type: '',
 };
 
+// ------------------------- Api ----------------------------
+
+interface ApiState {
+  type: string;
+  loading: boolean;
+  error: string | null;
+  response: object;
+}
+
+const ApiInititalState: ApiState = {
+  type: '',
+  loading: false,
+  error: null,
+  response: {},
+};
+
+const NFC_TEST = 'NFC_TEST';
+const NFC_RESPONSE = 'NFC_RESPONSE';
+const NFC_ERROR = 'NFC_ERROR';
+
+const apiReducer = (state = ApiInititalState, action: any) => {
+  switch (action.type) {
+    case NFC_TEST:
+      return {
+        ...state,
+        loading: true,
+      };
+
+    case NFC_RESPONSE:
+      return {
+        ...state,
+        loading: false,
+        response: action.payload,
+      };
+
+    case NFC_ERROR:
+      return {
+        ...state,
+        loading: false,
+        error: action.payload,
+      };
+
+    default:
+      return state;
+  }
+};
+
+// ------------ X ------------ X ----------- X -----------------
+
 type CardAction = CardState;
 
 const CardReducer = (state = cardInitialState, action: CardAction) => {
@@ -68,6 +117,7 @@ const CardReducer = (state = cardInitialState, action: CardAction) => {
 const rootReducer = combineReducers({
   counterReducer: exampleReducer,
   cardReducer: CardReducer,
+  ApiReducer: apiReducer,
 });
 
 export type RootState = ReturnType<typeof rootReducer>;
