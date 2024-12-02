@@ -22,12 +22,16 @@ import NFCFiled from './NFCFiled';
 import NfcManager, {NfcTech} from 'react-native-nfc-manager';
 import {fetchNFCSec} from '../Api/NetworkManager';
 import {useAppDispatch, useAppSelector} from '../hooks/reduxHooks';
+import CryptoJS from 'crypto-js';
+import AES from 'react-native-aes-crypto';
+import {Buffer} from 'buffer';
 
 type WelcomeScreenProps = StackScreenProps<any, 'Welcome'>;
 
 const WelcomeScreen: React.FC<WelcomeScreenProps> = ({navigation}) => {
   // const dispatch = useDispatch();
   const dispatch = useAppDispatch();
+
   const {loading, error, response} = useSelector(
     (state: RootState) => state.ApiReducer,
   );
@@ -40,6 +44,83 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({navigation}) => {
   useEffect(() => {
     console.log('loading: ', loading);
   }, [loading]);
+
+  useEffect(() => {
+    console.log('response: ', response.data);
+
+    decryptData(
+      'WFhwQitQRXR3ZDAxQndObysyM1Mydz09',
+      'USymMYYWZdDxkmQYGqc+V0dO2I2O1y7bo+x5IzGxGPU=',
+      'qtyJerluyxRlD2ClhJsbtA==',
+    );
+  }, [response]);
+
+  const decryptData = async (
+    encryptedText: string,
+    key: string,
+    iv: string,
+  ) => {
+    try {
+      // Convert base64 strings to buffers
+      const keys = Buffer.from(key, 'base64');
+      const ivs = Buffer.from(iv, 'base64');
+      const encryptedPwd = Buffer.from(encryptedText, 'base64');
+
+      console.log('keys: ', keys);
+      console.log('ivs: ', ivs);
+      console.log('encryptedPwd: ', encryptedPwd);
+
+      // Perform AES decryption (AES-CBC, PKCS5 padding)
+      const decryptedPwd = await AES.decrypt(
+        encryptedPwd.toString('base64'),
+        keys.toString('base64'),
+        ivs.toString('base64'),
+        'aes-256-cbc',
+      );
+
+      // Log the decrypted password
+      console.log('Decrypted NFC Password: ', decryptedPwd);
+      return decryptedPwd;
+    } catch (error) {
+      console.error('Error decrypting NFC password: ', error);
+    }
+  };
+
+  // const authenticateAndReadNFC = (
+  //   key: string,
+  //   iv: string,
+  //   encryptedPwd: string,
+  // ) => {
+  //   try {
+  //     if (!key || !iv || !encryptedPwd)
+  //       throw new Error('Missing stored credentials!');
+
+  //     const keyBytes = CryptoJS.enc.Base64.parse(key);
+  //     const ivBytes = CryptoJS.enc.Base64.parse(iv);
+  //     const encryptedBytes = CryptoJS.enc.Base64.parse(encryptedPwd);
+
+  //     console.log('Key Bytes: ', keyBytes.toString());
+  //     console.log('IV Bytes: ', ivBytes.toString());
+  //     console.log('Encrypted Bytes: ', encryptedBytes.toString());
+
+  //     const decryptedPwd = CryptoJS.AES.decrypt(
+  //       encryptedBytes.toString(CryptoJS.enc.Base64), // Convert to Base64 string
+  //       keyBytes,
+  //       {iv: ivBytes, mode: CryptoJS.mode.CBC, padding: CryptoJS.pad.Pkcs7},
+  //     ).toString(CryptoJS.enc.Utf8);
+
+  //     console.log('Decrypted NFC Password: ', decryptedPwd);
+
+  //     if (!decryptedPwd)
+  //       throw new Error('Decryption failed: Decrypted password is empty!');
+
+  //     const tagData =
+  //       '1JqmHZeCjywJf4xlKrLmdDYshnNaOspmsEMWchesB8fp2bdxq5yOf8WKPNZf8R0A';
+  //     console.log('Simulated NFC Tag Data: ', tagData);
+  //   } catch (error) {
+  //     console.error('Error in NFC authentication: ', error);
+  //   }
+  // };
 
   const handlePress = () => {
     navigation.navigate('Pharmacy');

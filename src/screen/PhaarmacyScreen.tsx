@@ -74,7 +74,7 @@ const PharmacyScreen: React.FC<SecondScreenProps> = ({navigation}) => {
       },
     );
 
-    Alert.alert('asdasd');
+    // Alert.alert('asdasd');
 
     return () => {
       socketService.close();
