@@ -29,6 +29,7 @@ import {RootState} from '../redux/store';
 import Topbar from '../components/TopBar';
 import CountdownCircle from '../components/CountdownCircle';
 import SocketService from '../components/SocketService';
+import Toast from 'react-native-simple-toast';
 
 // type PharmacyScreenProps = StackScreenProps<any, 'Pharmacy'>;
 type SecondScreenProps = {
@@ -53,6 +54,7 @@ const PharmacyScreen: React.FC<SecondScreenProps> = ({navigation}) => {
   const [message, setMessage] = useState('');
   const [receivedMessages, setReceivedMessages] = useState<string[]>([]);
   const socketService = new SocketService(socketUrl);
+  const [socketStatus, setSocketStatus] = useState(false);
 
   // ------------------------------------------------------------------------------------
 
@@ -64,13 +66,19 @@ const PharmacyScreen: React.FC<SecondScreenProps> = ({navigation}) => {
   let interval: NodeJS.Timeout | null = null;
 
   useEffect(() => {
-    // Timer will run in the background
-    // TimeOutinit();
+    if (receivedMessages.length != 0) {
+      setSocketStatus(true);
+      Toast.show(`response: ${receivedMessages}`, Toast.LONG);
+    } else {
+      setSocketStatus(false);
+    }
+  }, [receivedMessages]);
 
+  useEffect(() => {
     socketService.connect(
       '1JqmHZeCjywJf4xlKrLmdDYshnNaOspmsEMWchesB8fp2bdxq5yOf8WKPNZf8R0A',
       data => {
-        setReceivedMessages(prevMessages => [...prevMessages, data.message]);
+        setReceivedMessages(prevMessages => [...prevMessages, data]);
       },
     );
 
@@ -266,12 +274,15 @@ const PharmacyScreen: React.FC<SecondScreenProps> = ({navigation}) => {
       <HandShakeImage />
       <TopText />
       <ContentView />
-      <CountdownTimer
-        duration={120}
-        onComplete={() => {
-          Alert.alert('Timer completed!');
-        }}
-      />
+      {socketStatus && (
+        <CountdownTimer
+          duration={120}
+          onComplete={() => {
+            Alert.alert('Timer completed!');
+          }}
+        />
+      )}
+
       <InfoImage />
       <BottomBar />
     </View>

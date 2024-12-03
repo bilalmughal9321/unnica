@@ -25,6 +25,8 @@ import {useAppDispatch, useAppSelector} from '../hooks/reduxHooks';
 import CryptoJS from 'crypto-js';
 import AES from 'react-native-aes-crypto';
 import {Buffer} from 'buffer';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import UUID from 'react-native-uuid';
 
 type WelcomeScreenProps = StackScreenProps<any, 'Welcome'>;
 
@@ -39,6 +41,7 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({navigation}) => {
   useEffect(() => {
     // console.log('aabsdjhabsd');
     // dispatch(fetchNFCSec());
+    dispatch(fetchNFCSec());
   }, []);
 
   useEffect(() => {
@@ -48,12 +51,26 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({navigation}) => {
   useEffect(() => {
     console.log('response: ', response.data);
 
-    decryptData(
-      'WFhwQitQRXR3ZDAxQndObysyM1Mydz09',
-      'USymMYYWZdDxkmQYGqc+V0dO2I2O1y7bo+x5IzGxGPU=',
-      'qtyJerluyxRlD2ClhJsbtA==',
-    );
+    // decryptData(
+    //   'WFhwQitQRXR3ZDAxQndObysyM1Mydz09',
+    //   'USymMYYWZdDxkmQYGqc+V0dO2I2O1y7bo+x5IzGxGPU=',
+    //   'qtyJerluyxRlD2ClhJsbtA==',
+    // );
+    // getOrCreateUUID();
   }, [response]);
+
+  const getOrCreateUUID = async () => {
+    const existingUUID = await AsyncStorage.getItem('deviceUUID');
+    if (existingUUID) {
+      console.log('Existing UUID:', existingUUID);
+      return existingUUID;
+    } else {
+      const newUUID = UUID.v4();
+      await AsyncStorage.setItem('deviceUUID', newUUID);
+      console.log('Generated New UUID:', newUUID);
+      return newUUID;
+    }
+  };
 
   const decryptData = async (
     encryptedText: string,
@@ -173,8 +190,8 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({navigation}) => {
     return (
       <View style={[styles.signal_view]}>
         <TouchableOpacity
-          // onPress={() => readNdef()}
-          onPress={() => dispatch(fetchNFCSec())}
+          onPress={() => readNdef()}
+          // onPress={() => dispatch(fetchNFCSec())}
           style={styles.signal_view_touch}>
           <Image
             source={require('../asset/new/Signal.png')}
@@ -241,9 +258,6 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({navigation}) => {
       {loading && loadingFunc()}
       <Topbar isTitle={false} topBarStyle={{marginTop: hasNotch() ? 40 : 0}} />
       <TopText />
-      <Text style={{color: 'white', fontWeight: '600'}}>
-        asfasf {loading ? 'true' : 'false'}
-      </Text>
       <Signal_section />
       <CardView />
 

@@ -21,19 +21,15 @@ class SocketService {
       };
 
       // console.log('response: ', JSON.stringify(payload));
-
-      Toast.show('This is a long toast.', Toast.LONG);
-
-      Alert.alert('asdad');
-
       this.sendMessage(payload);
     };
 
     this.socket.onmessage = message => {
-      Toast.show(message.data, Toast.LONG);
-      console.log('response: ', message.data);
+      // Toast.show(`response: ${message.data}`, Toast.LONG);
+
+      // console.log('response: ', message.data);
       // const data = JSON.parse(message);
-      // onMessage(data);
+      onMessage(message.data);
     };
 
     this.socket.onerror = error => {
