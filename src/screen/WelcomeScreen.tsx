@@ -57,7 +57,54 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({navigation}) => {
     //   'qtyJerluyxRlD2ClhJsbtA==',
     // );
     // getOrCreateUUID();
+
+    // const keyBase64 = 'USymMYYWZdDxkmQYGqc+V0dO2I2O1y7bo+x5IzGxGPU=';
+    // const ivBase64 = 'qtyJerluyxRlD2ClhJsbtA==';
+    // const encryptedPwdBase64 = 'WFhwQitQRXR3ZDAxQndObysyM1Mydz09';
+
+    // const key = CryptoJS.enc.Base64.parse(keyBase64);
+    // const iv = CryptoJS.enc.Base64.parse(ivBase64);
+    // const encryptedPwd = CryptoJS.enc.Base64.parse(encryptedPwdBase64);
+
+    // console.log('key: ', key);
+    // console.log('iv: ', iv);
+    // console.log('encryptedPwd: ', encryptedPwd);
+
+    // const decryptedPassword = decryptAES(encryptedPwd, key, iv);
+    // console.log('Decrypted Password:', decryptedPassword);
+
+    // const keyBase64 = 'USymMYYWZdDxkmQYGqc+V0dO2I2O1y7bo+x5IzGxGPU=';
+    // const ivBase64 = 'qtyJerluyxRlD2ClhJsbtA==';
+    // const encryptedPwdBase64 = 'WFhwQitQRXR3ZDAxQndObysyM1Mydz09';
+
+    // // Decode Base64 strings
+    // const keyBytes = Buffer.from(keyBase64, 'base64');
+    // const ivBytes = Buffer.from(ivBase64, 'base64');
+    // const encryptedPwdBytes = Buffer.from(encryptedPwdBase64, 'base64');
+
+    // // Convert bytes back to string if needed
+    // const keyString = keyBytes.toString('utf-8');
+    // const ivString = ivBytes.toString('utf-8');
+    // const encryptedPwdString = encryptedPwdBytes.toString('utf-8');
+
+    // console.log('Decoded Key (Bytes):', keyBytes);
+    // console.log('Decoded IV (Bytes):', ivBytes);
+    // console.log('Decoded Encrypted Password (Bytes):', encryptedPwdBytes);
+
+    // console.log('Decoded Key (String):', keyString);
+    // console.log('Decoded IV (String):', ivString);
+    // console.log('Decoded Encrypted Password (String):', encryptedPwdString);
   }, [response]);
+
+  const decryptAES = (encryptedTextBase64: any, key: any, iv: any) => {
+    const decrypted = CryptoJS.AES.decrypt(encryptedTextBase64, key, {
+      iv: iv,
+      mode: CryptoJS.mode.CBC,
+      padding: CryptoJS.pad.Pkcs7,
+    });
+    // console.log('decrypt: ', decrypted);
+    return decrypted.toString(CryptoJS.enc.Utf8); // Convert bytes to string
+  };
 
   const getOrCreateUUID = async () => {
     const existingUUID = await AsyncStorage.getItem('deviceUUID');
@@ -103,41 +150,41 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({navigation}) => {
     }
   };
 
-  // const authenticateAndReadNFC = (
-  //   key: string,
-  //   iv: string,
-  //   encryptedPwd: string,
-  // ) => {
-  //   try {
-  //     if (!key || !iv || !encryptedPwd)
-  //       throw new Error('Missing stored credentials!');
+  const authenticateAndReadNFC = (
+    key: string,
+    iv: string,
+    encryptedPwd: string,
+  ) => {
+    try {
+      if (!key || !iv || !encryptedPwd)
+        throw new Error('Missing stored credentials!');
 
-  //     const keyBytes = CryptoJS.enc.Base64.parse(key);
-  //     const ivBytes = CryptoJS.enc.Base64.parse(iv);
-  //     const encryptedBytes = CryptoJS.enc.Base64.parse(encryptedPwd);
+      const keyBytes = CryptoJS.enc.Base64.parse(key);
+      const ivBytes = CryptoJS.enc.Base64.parse(iv);
+      const encryptedBytes = CryptoJS.enc.Base64.parse(encryptedPwd);
 
-  //     console.log('Key Bytes: ', keyBytes.toString());
-  //     console.log('IV Bytes: ', ivBytes.toString());
-  //     console.log('Encrypted Bytes: ', encryptedBytes.toString());
+      console.log('Key Bytes: ', keyBytes.toString());
+      console.log('IV Bytes: ', ivBytes.toString());
+      console.log('Encrypted Bytes: ', encryptedBytes.toString());
 
-  //     const decryptedPwd = CryptoJS.AES.decrypt(
-  //       encryptedBytes.toString(CryptoJS.enc.Base64), // Convert to Base64 string
-  //       keyBytes,
-  //       {iv: ivBytes, mode: CryptoJS.mode.CBC, padding: CryptoJS.pad.Pkcs7},
-  //     ).toString(CryptoJS.enc.Utf8);
+      const decryptedPwd = CryptoJS.AES.decrypt(
+        encryptedBytes.toString(CryptoJS.enc.Base64), // Convert to Base64 string
+        keyBytes,
+        {iv: ivBytes, mode: CryptoJS.mode.CBC, padding: CryptoJS.pad.Pkcs7},
+      ).toString(CryptoJS.enc.Utf8);
 
-  //     console.log('Decrypted NFC Password: ', decryptedPwd);
+      console.log('Decrypted NFC Password: ', decryptedPwd);
 
-  //     if (!decryptedPwd)
-  //       throw new Error('Decryption failed: Decrypted password is empty!');
+      if (!decryptedPwd)
+        throw new Error('Decryption failed: Decrypted password is empty!');
 
-  //     const tagData =
-  //       '1JqmHZeCjywJf4xlKrLmdDYshnNaOspmsEMWchesB8fp2bdxq5yOf8WKPNZf8R0A';
-  //     console.log('Simulated NFC Tag Data: ', tagData);
-  //   } catch (error) {
-  //     console.error('Error in NFC authentication: ', error);
-  //   }
-  // };
+      const tagData =
+        '1JqmHZeCjywJf4xlKrLmdDYshnNaOspmsEMWchesB8fp2bdxq5yOf8WKPNZf8R0A';
+      console.log('Simulated NFC Tag Data: ', tagData);
+    } catch (error) {
+      console.error('Error in NFC authentication: ', error);
+    }
+  };
 
   const handlePress = () => {
     navigation.navigate('Pharmacy');
@@ -190,8 +237,8 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({navigation}) => {
     return (
       <View style={[styles.signal_view]}>
         <TouchableOpacity
-          onPress={() => readNdef()}
-          // onPress={() => dispatch(fetchNFCSec())}
+          // onPress={() => readNdef()}
+          onPress={() => dispatch(fetchNFCSec())}
           style={styles.signal_view_touch}>
           <Image
             source={require('../asset/new/Signal.png')}

@@ -38,7 +38,6 @@
     "react-native-svg": "^15.7.1",
     "react-native-touch-id": "^4.4.1",
     "react-native-uuid": "^2.0.3",
-    "react-native-webcrypto": "^1.0.0-alpha.3",
     "react-redux": "^9.1.2",
     "redux": "^5.0.1",
     "rn-slide-button": "^1.0.3",
