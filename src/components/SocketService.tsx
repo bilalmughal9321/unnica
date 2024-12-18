@@ -52,7 +52,9 @@ class SocketService {
   }
 
   close() {
+    console.log('aa');
     if (this.socket) {
+      console.log('bb');
       this.socket.close();
       this.socket = null;
     }

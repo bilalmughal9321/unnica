@@ -26,6 +26,15 @@ const SplashScreen: React.FC<SplashScreenProps> = ({navigation}) => {
   };
 
   useEffect(() => {
+    const timer = setTimeout(() => {
+      navigation.navigate('Welcome');
+    }, 3000);
+
+    // Clear timeout on component unmount
+    return () => clearTimeout(timer);
+  }, []);
+
+  const handleNFCSecTest = () => {
     const keyBase64 = 'USymMYYWZdDxkmQYGqc+V0dO2I2O1y7bo+x5IzGxGPU=';
     const ivBase64 = 'qtyJerluyxRlD2ClhJsbtA==';
     const encryptedPwdBase64 = 'XXpB+PEtwd01BwNo+23S2w==';
@@ -47,117 +56,6 @@ const SplashScreen: React.FC<SplashScreenProps> = ({navigation}) => {
     const decryptedPwd = decrypted.toString(CryptoJS.enc.Utf8);
 
     console.log('Decrypted Password:', decryptedPwd);
-
-    // const timer = setTimeout(() => {
-    //   navigation.navigate('Welcome');
-    // }, 3000);
-
-    // return () => clearTimeout(timer);
-    // Base64 encoded values
-    // const keyBase64 = 'USymMYYWZdDxkmQYGqc+V0dO2I2O1y7bo+x5IzGxGPU=';
-    // const ivBase64 = 'qtyJerluyxRlD2ClhJsbtA==';
-    // const encryptedPwdBase64 = 'XXpB+PEtwd01BwNo+23S2w==';
-
-    // Usage
-    // decryptAES();
-    // .then((decryptedText: string | void) => {
-    //   if (decryptedText) {
-    //     console.log('Decrypted Password:', decryptedText);
-    //   }
-    // })
-    // .catch((error: any) => console.error('Error in decryption:', error));
-
-    // const base64Key = 'USymMYYWZdDxkmQYGqc+V0dO2I2O1y7bo+x5IzGxGPU=';
-    // const decodedKey = Buffer.from(base64Key, 'base64'); // Decode Base64 to bytes
-
-    // console.log(decodedKey); // Output in byte array
-    // console.log(decodedKey.length); // Should show 32 bytes
-
-    // const hexKey = Buffer.from([
-    //   170, 220, 137, 122, 185, 110, 203, 20, 101, 15, 96, 165, 132, 155, 27,
-    //   180,
-    // ]).toString('hex');
-    // console.log(hexKey);
-
-    // const keyHex =
-    //   '512ca631861665d0f19264181aa73e57474ed88d8ed72edba3ec792331b118f5';
-    // const keyBuffer = Buffer.from(keyHex, 'hex');
-    // const kesyBase64 = keyBuffer.toString('base64');
-    // console.log(kesyBase64);
-  }, []);
-
-  // AES Decryption function
-  // const decryptAES = async (
-  //   encryptedTextBase64: string,
-  //   keyBase64: string,
-  //   ivBase64: string,
-  // ): Promise<string | void> => {
-  //   try {
-  //     // Decode Base64 inputs to bytes
-  //     const key: Buffer = Buffer.from(keyBase64, 'base64');
-  //     const iv: Buffer = Buffer.from(ivBase64, 'base64');
-  //     const encryptedText: string = Buffer.from(
-  //       encryptedTextBase64,
-  //       'base64',
-  //     ).toString('utf-8');
-
-  //     console.log('Key (Bytes):', key);
-  //     console.log('IV (Bytes):', iv);
-  //     console.log('Encrypted Text (Decoded):', encryptedText);
-
-  //     // Decrypt the data using AES-256-CBC
-  //     const decrypted: string = await Aes.decrypt(
-  //       encryptedText,
-  //       key.toString('base64'),
-  //       iv.toString('base64'),
-  //       'aes-256-cbc',
-  //     );
-  //     console.log('Decrypted Text:', decrypted);
-  //     return decrypted;
-  //   } catch (error) {
-  //     console.error('Decryption error:', error);
-  //   }
-  // };
-
-  const decryptAES = async () => {
-    try {
-      // Input Data (Base64 encoded)
-      const keyBase64 = 'USymMYYWZdDxkmQYGqc+V0dO2I2O1y7bo+x5IzGxGPU=';
-      const ivBase64 = 'qtyJerluyxRlD2ClhJsbtA==';
-      const encryptedPwdBase64 = 'XXpB+PEtwd01BwNo+23S2w==';
-
-      // Algorithm
-      const algorithm = 'aes-256-cbc';
-
-      // Decode Base64 inputs to bytes
-      const decodedKey = Buffer.from(keyBase64, 'base64'); // Should be 32 bytes
-      const decodedIv = Buffer.from(ivBase64, 'base64'); // Should be 16 bytes
-      const decodedEncryptedPwd = Buffer.from(encryptedPwdBase64, 'base64'); // Should be in bytes
-
-      console.log('Decoded Key:', decodedKey); // Debug: Check key
-      console.log('Decoded Key length:', decodedKey.length); // Debug: Check key
-      console.log('\n');
-      console.log('Decoded IV:', decodedIv); // Debug: Check IV
-      console.log('Decoded IV length:', decodedIv.length); // Debug: Check IV
-      console.log('\n');
-      console.log('Decoded Encrypted Password:', decodedEncryptedPwd); // Debug: Check ciphertext
-      console.log(
-        'Decoded Encrypted Password length:',
-        decodedEncryptedPwd.length,
-      ); // Debug: Check ciphertext
-      console.log('\n');
-
-      // Decrypt the password
-      const decrypted = await Aes.decrypt(
-        decodedEncryptedPwd.toString('base64'), // Ciphertext
-        decodedKey.toString('base64'), // Key
-        decodedIv.toString('base64'), // IV
-        algorithm,
-      );
-      console.log('Decrypted Password:', decrypted);
-    } catch (error) {
-      console.error('Decryption Error:', error);
-    }
   };
 
   const handlePress = () => {
@@ -177,7 +75,8 @@ const SplashScreen: React.FC<SplashScreenProps> = ({navigation}) => {
 
   const Splash_Image = () => {
     return (
-      <View
+      <TouchableOpacity
+        onPress={() => navigation.navigate('Welcome')}
         style={{
           alignSelf: 'center',
           flexDirection: 'column',
@@ -212,7 +111,7 @@ const SplashScreen: React.FC<SplashScreenProps> = ({navigation}) => {
           }}>
           Say hello to a new way of shopping
         </Text>
-      </View>
+      </TouchableOpacity>
     );
   };
 

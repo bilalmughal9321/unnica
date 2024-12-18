@@ -27,6 +27,7 @@ import AES from 'react-native-aes-crypto';
 import {Buffer} from 'buffer';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import UUID from 'react-native-uuid';
+import Toast from 'react-native-simple-toast';
 
 type WelcomeScreenProps = StackScreenProps<any, 'Welcome'>;
 
@@ -191,20 +192,35 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({navigation}) => {
   };
 
   async function readNdef() {
-    navigation.navigate('Pharmacy');
-    // try {
-    //   // register for the NFC tag with NDEF in it
-    //   await NfcManager.requestTechnology(NfcTech.Ndef);
-    //   // the resolved tag object will contain `ndefMessage` property
-    //   const tag = await NfcManager.getTag();
-    //   console.warn('Tag found', tag);
-    //   navigation.navigate('Pharmacy');
-    // } catch (ex) {
-    //   console.warn('Oops!', ex);
-    // } finally {
-    //   // stop the nfc scanning
-    //   NfcManager.cancelTechnologyRequest();
-    // }
+    // navigation.navigate('Pharmacy');
+    try {
+      // register for the NFC tag with NDEF in it
+      await NfcManager.requestTechnology(NfcTech.Ndef);
+      // the resolved tag object will contain `ndefMessage` property
+      const tag = await NfcManager.getTag();
+      console.warn('Tag found', tag);
+      // navigation.navigate('Pharmacy');
+
+      if (tag.ndefMessage && tag.ndefMessage.length > 0) {
+        // Get the payload from the first NDEF record
+        const payload = tag.ndefMessage[0].payload;
+        // Decode the payload
+        const languageCodeLength = payload[0];
+        const text = String.fromCharCode(
+          ...payload.slice(languageCodeLength + 1),
+        );
+        console.log('Decoded text:', text);
+
+        Toast.show(`${text}`, Toast.LONG);
+
+        navigation.navigate('Pharmacy');
+      }
+    } catch (ex) {
+      console.warn('Oops!', ex);
+    } finally {
+      // stop the nfc scanning
+      NfcManager.cancelTechnologyRequest();
+    }
   }
 
   // --------------------------------------------------------------
@@ -237,8 +253,8 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({navigation}) => {
     return (
       <View style={[styles.signal_view]}>
         <TouchableOpacity
-          // onPress={() => readNdef()}
-          onPress={() => dispatch(fetchNFCSec())}
+          onPress={() => readNdef()}
+          // onPress={() => dispatch(fetchNFCSec())}
           style={styles.signal_view_touch}>
           <Image
             source={require('../asset/new/Signal.png')}

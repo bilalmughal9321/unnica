@@ -18,16 +18,36 @@ const CircularCountdownTimer: React.FC<CircularCountdownTimerProps> = ({
   const [color, setColor] = useState('white'); // Initial color
   const [strokeDashoffset, setStrokeDashoffset] = useState(circumference);
 
+  // useEffect(() => {
+  //   if (remainingTime <= 0) {
+  //     onComplete();
+  //     return;
+  //   }
+
+  //   const interval = setInterval(() => {
+  //     setStrokeDashoffset((remainingTime / duration) * circumference);
+  //     setRemainingTime(prevTime => prevTime - 1);
+  //   }, 1000);
+  //   return () => clearInterval(interval);
+  // }, [remainingTime]);
+
   useEffect(() => {
     if (remainingTime <= 0) {
       onComplete();
       return;
     }
 
+    // Immediately update the strokeDashoffset and decrement time
+    setStrokeDashoffset((remainingTime / duration) * circumference);
+
     const interval = setInterval(() => {
-      setRemainingTime(prevTime => prevTime - 1);
-      setStrokeDashoffset((remainingTime / duration) * circumference);
+      setRemainingTime(prevTime => {
+        const newTime = prevTime - 1;
+        setStrokeDashoffset((newTime / duration) * circumference);
+        return newTime;
+      });
     }, 1000);
+
     return () => clearInterval(interval);
   }, [remainingTime]);
 

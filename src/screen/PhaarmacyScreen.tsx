@@ -38,6 +38,11 @@ type SecondScreenProps = {
 
 const socketUrl = 'ws://api.ci.unnica-dev.co/ws';
 
+interface Message {
+  action: string;
+  msg: string;
+}
+
 const PharmacyScreen: React.FC<SecondScreenProps> = ({navigation}) => {
   const [seconds, setSeconds] = useState<number>(0);
   const [isConfirmed, setIsConfirmed] = useState<boolean>(false);
@@ -53,6 +58,7 @@ const PharmacyScreen: React.FC<SecondScreenProps> = ({navigation}) => {
 
   const [message, setMessage] = useState('');
   const [receivedMessages, setReceivedMessages] = useState<string[]>([]);
+  // const [receivedMessages, setReceivedMessages] = useState<Message[]>([]);
   const socketService = new SocketService(socketUrl);
   const [socketStatus, setSocketStatus] = useState(false);
 
@@ -67,9 +73,11 @@ const PharmacyScreen: React.FC<SecondScreenProps> = ({navigation}) => {
 
   useEffect(() => {
     if (receivedMessages.length != 0) {
+      // if (receivedMessages[0].action == "")
       setSocketStatus(true);
-      Toast.show(`response: ${receivedMessages}`, Toast.LONG);
+      Toast.show(`${receivedMessages}`, Toast.LONG);
     } else {
+      Toast.show(`${receivedMessages}`, Toast.LONG);
       setSocketStatus(false);
     }
   }, [receivedMessages]);
@@ -85,13 +93,15 @@ const PharmacyScreen: React.FC<SecondScreenProps> = ({navigation}) => {
     // Alert.alert('asdasd');
 
     return () => {
-      socketService.close();
-    };
-
-    return () => {
+      socketClose();
       clearTimer();
     };
   }, [remainingTime]);
+
+  const socketClose = () => {
+    Toast.show(`response: time is up and door is closed`, Toast.LONG);
+    socketService.close();
+  };
 
   const TimeOutinit = () => {
     if (remainingTime < 120) {
@@ -276,9 +286,10 @@ const PharmacyScreen: React.FC<SecondScreenProps> = ({navigation}) => {
       <ContentView />
       {socketStatus && (
         <CountdownTimer
-          duration={120}
+          duration={20}
           onComplete={() => {
-            Alert.alert('Timer completed!');
+            // Alert.alert('Timer completed!');
+            socketClose();
           }}
         />
       )}
