@@ -13,11 +13,27 @@ interface TopBarProps {
   topBarStyle?: ViewStyle;
   isTitle: Boolean;
   openDrawer?: () => void;
+  openLogo?: () => void;
 }
 
-const Topbar: React.FC<TopBarProps> = ({topBarStyle, isTitle, openDrawer}) => (
+const Topbar: React.FC<TopBarProps> = ({
+  topBarStyle,
+  isTitle,
+  openDrawer,
+  openLogo,
+}) => (
   <View style={[styles.container, topBarStyle]}>
-    <Image source={require('../asset/new/Logo.png')} style={styles.logo} />
+    <TouchableOpacity
+      onPress={openLogo}
+      style={[
+        styles.logo,
+        {justifyContent: 'center', alignContent: 'center', alignSelf: 'center'},
+      ]}>
+      <Image
+        style={{width: '60%', resizeMode: 'contain', alignSelf: 'center'}}
+        source={require('../asset/new/Logo.png')}
+      />
+    </TouchableOpacity>
     {isTitle ? (
       <Image
         source={require('../asset/new/Store.png')}

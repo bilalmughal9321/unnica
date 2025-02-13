@@ -28,12 +28,25 @@ import {Buffer} from 'buffer';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import UUID from 'react-native-uuid';
 import Toast from 'react-native-simple-toast';
+import TouchID from 'react-native-touch-id';
 
 type WelcomeScreenProps = StackScreenProps<any, 'Welcome'>;
 
 const WelcomeScreen: React.FC<WelcomeScreenProps> = ({navigation}) => {
   // const dispatch = useDispatch();
   const dispatch = useAppDispatch();
+
+  const optionalConfigObject = {
+    title: 'Authentication Required', // Android
+    imageColor: '#e00606', // Android
+    imageErrorColor: '#ff0000', // Android
+    sensorDescription: 'Touch sensor', // Android
+    sensorErrorDescription: 'Failed', // Android
+    cancelText: 'Cancel', // Android
+    fallbackLabel: 'Show Passcode', // iOS (if empty, then label is hidden)
+    unifiedErrors: false, // use unified error messages (default false)
+    passcodeFallback: false, // iOS - allows the device to fall back to using the passcode, if faceid/touch is not available. this does not mean that if touchid/faceid fails the first few times it will revert to passcode, rather that if the former are not enrolled, then it will use the passcode.
+  };
 
   const {loading, error, response} = useSelector(
     (state: RootState) => state.ApiReducer,
@@ -201,6 +214,10 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({navigation}) => {
       console.warn('Tag found', tag);
       // navigation.navigate('Pharmacy');
 
+      setTimeout(() => {
+        navigation.navigate('Pharmacy');
+      }, 4000);
+
       if (tag.ndefMessage && tag.ndefMessage.length > 0) {
         // Get the payload from the first NDEF record
         const payload = tag.ndefMessage[0].payload;
@@ -212,8 +229,6 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({navigation}) => {
         console.log('Decoded text:', text);
 
         Toast.show(`${text}`, Toast.LONG);
-
-        navigation.navigate('Pharmacy');
       }
     } catch (ex) {
       console.warn('Oops!', ex);
@@ -253,7 +268,19 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({navigation}) => {
     return (
       <View style={[styles.signal_view]}>
         <TouchableOpacity
-          onPress={() => readNdef()}
+          onPress={() => {
+            TouchID.authenticate(
+              'to demo this react-native component',
+              optionalConfigObject,
+            )
+              .then(success => {
+                // Alert.alert('Authenticated Successfully');
+                readNdef();
+              })
+              .catch(error => {
+                // Alert.alert(`Authentication Failed: ${error}`);
+              });
+          }}
           // onPress={() => dispatch(fetchNFCSec())}
           style={styles.signal_view_touch}>
           <Image

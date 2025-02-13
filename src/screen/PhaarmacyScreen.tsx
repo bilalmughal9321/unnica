@@ -49,6 +49,7 @@ const PharmacyScreen: React.FC<SecondScreenProps> = ({navigation}) => {
   const [isFirstTime, setIsFirstTime] = useState<boolean>(true);
   const [isExpanded, setIsExpanded] = useState<boolean>(true); // For expanding/collapsing timer
   const [remainingTime, setRemainingTime] = useState<number>(0); // Timer's remaining time state
+  const [splashScreen, setSplashScreen] = useState<boolean>(false);
 
   const widthAnim = useRef(new Animated.Value(200)).current; // Initial width for small rectangle
   const heightAnim = useRef(new Animated.Value(200)).current; // Initial height
@@ -70,6 +71,14 @@ const PharmacyScreen: React.FC<SecondScreenProps> = ({navigation}) => {
   const dispatch = useDispatch();
 
   let interval: NodeJS.Timeout | null = null;
+
+  useEffect(() => {
+    setSplashScreen(true);
+
+    setInterval(() => {
+      setSplashScreen(false);
+    }, 3000);
+  }, []);
 
   useEffect(() => {
     if (receivedMessages.length != 0) {
@@ -188,6 +197,24 @@ const PharmacyScreen: React.FC<SecondScreenProps> = ({navigation}) => {
     );
   };
 
+  const SplashImage = () => {
+    return (
+      <View
+        style={{
+          justifyContent: 'center',
+          alignContent: 'center',
+          alignItems: 'center',
+          flex: 1,
+          flexDirection: 'column',
+        }}>
+        <Image
+          source={require('../asset/new/Store.png')}
+          style={pharmacyStyles.signal_image}
+        />
+      </View>
+    );
+  };
+
   // --------------------------------------------------------------
 
   const BottomBar = () => {
@@ -274,28 +301,37 @@ const PharmacyScreen: React.FC<SecondScreenProps> = ({navigation}) => {
         flexDirection: 'column',
         backgroundColor: Constant.backgroundColor,
       }}>
-      <Topbar
-        isTitle={true}
-        topBarStyle={{marginTop: hasNotch() ? 45 : 0}}
-        openDrawer={() => {
-          console.log('asdas');
-        }}
-      />
-      <HandShakeImage />
-      <TopText />
-      <ContentView />
-      {socketStatus && (
-        <CountdownTimer
-          duration={20}
-          onComplete={() => {
-            // Alert.alert('Timer completed!');
-            socketClose();
-          }}
-        />
-      )}
+      {splashScreen ? (
+        <SplashImage />
+      ) : (
+        <View style={{flex: 1}}>
+          <Topbar
+            isTitle={true}
+            topBarStyle={{marginTop: hasNotch() ? 45 : 0}}
+            openDrawer={() => {
+              console.log('asdas');
+            }}
+            openLogo={() => {
+              navigation.goBack();
+            }}
+          />
+          <HandShakeImage />
+          <TopText />
+          <ContentView />
+          {socketStatus && (
+            <CountdownTimer
+              duration={20}
+              onComplete={() => {
+                // Alert.alert('Timer completed!');
+                socketClose();
+              }}
+            />
+          )}
 
-      <InfoImage />
-      <BottomBar />
+          <InfoImage />
+          <BottomBar />
+        </View>
+      )}
     </View>
   );
 };
