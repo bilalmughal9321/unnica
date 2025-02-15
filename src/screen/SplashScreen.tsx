@@ -1,14 +1,19 @@
 import React, {useEffect} from 'react';
-import {View, TouchableOpacity, Image, Alert, Text} from 'react-native';
-// import {StatusBar} from 'expo-status-bar';
+import {View, TouchableOpacity, Image, Text} from 'react-native';
 import {StackScreenProps} from '@react-navigation/stack';
-import PoweredBy from '../components/PoweredBy';
 import {styles} from '../../style';
-import TouchID from 'react-native-touch-id';
-import {Constant} from '../Utils';
-import {Buffer} from 'buffer';
-import Aes from 'react-native-aes-crypto';
-import CryptoJS from 'crypto-js';
+
+import {
+  GoogleSignin,
+  GoogleSigninButton,
+  statusCodes,
+} from '@react-native-google-signin/google-signin';
+import {english} from '../localization/english';
+import {
+  AppleButton,
+  appleAuth,
+} from '@invertase/react-native-apple-authentication';
+import auth from '@react-native-firebase/auth';
 
 type SplashScreenProps = StackScreenProps<any, 'Splash'>;
 
@@ -26,98 +31,143 @@ const SplashScreen: React.FC<SplashScreenProps> = ({navigation}) => {
   };
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      navigation.navigate('Welcome');
-    }, 3000);
-
+    // const user = checkUserLogin();
+    // console.log('User:', user ? 'Already logged in' : 'No user logged in');
+    // const timer = setTimeout(() => {
+    //   navigation.navigate('Welcome');
+    // }, 3000);
     // Clear timeout on component unmount
-    return () => clearTimeout(timer);
+    // return () => clearTimeout(timer);
   }, []);
-
-  const handleNFCSecTest = () => {
-    const keyBase64 = 'USymMYYWZdDxkmQYGqc+V0dO2I2O1y7bo+x5IzGxGPU=';
-    const ivBase64 = 'qtyJerluyxRlD2ClhJsbtA==';
-    const encryptedPwdBase64 = 'XXpB+PEtwd01BwNo+23S2w==';
-
-    const key = CryptoJS.enc.Base64.parse(keyBase64);
-    const iv = CryptoJS.enc.Base64.parse(ivBase64);
-    const encryptedPwd = CryptoJS.enc.Base64.parse(encryptedPwdBase64);
-
-    const cipherParams = CryptoJS.lib.CipherParams.create({
-      ciphertext: encryptedPwd,
-    });
-
-    const decrypted = CryptoJS.AES.decrypt(cipherParams, key, {
-      iv: iv,
-      mode: CryptoJS.mode.CBC,
-      padding: CryptoJS.pad.Pkcs7,
-    });
-
-    const decryptedPwd = decrypted.toString(CryptoJS.enc.Utf8);
-
-    console.log('Decrypted Password:', decryptedPwd);
-  };
-
-  const handlePress = () => {
-    navigation.navigate('Welcome');
-    // TouchID.authenticate(
-    //   'to demo this react-native component',
-    //   optionalConfigObject,
-    // )
-    //   .then(success => {
-    //     // Alert.alert('Authenticated Successfully');
-    //     navigation.navigate('Open');
-    //   })
-    //   .catch(error => {
-    //     // Alert.alert('Authentication Failed');
-    //   });
-  };
 
   const Splash_Image = () => {
     return (
       <TouchableOpacity
         onPress={() => navigation.navigate('Welcome')}
-        style={{
-          alignSelf: 'center',
-          flexDirection: 'column',
-          width: '70%',
-          alignItems: 'center',
-        }}>
+        style={[styles.splash_image]}>
         <Image
           source={require('../asset/new/Logo.png')}
-          style={{width: '70%', resizeMode: 'contain', height: 200}}
+          style={styles.splash_image_logo}
         />
-
-        <Text
-          style={{
-            fontSize: 35,
-            color: Constant.themeYellowColor,
-            textAlign: 'center',
-            fontWeight: '700',
-            marginTop: 30,
-            width: '80%',
-          }}>
-          UNNICA
-        </Text>
-
-        <Text
-          style={{
-            fontSize: 22,
-            color: Constant.whiteColor,
-            textAlign: 'center',
-            fontWeight: '700',
-            marginTop: 30,
-            width: '70%',
-          }}>
-          Say hello to a new way of shopping
-        </Text>
+        <Text style={styles.splash_image_title}>{english.unnicaTitle}</Text>
+        <Text style={styles.splash_image_subtitle}>{english.sayHello}</Text>
       </TouchableOpacity>
     );
   };
 
+  const googleLogin = async () => {
+    GoogleSignin.configure({
+      webClientId:
+        '1075936012101-5l3p7niseichilfl4ntfdjhg7ftr1ptv.apps.googleusercontent.com',
+    });
+    await GoogleSignin.hasPlayServices();
+    const userInfo = await GoogleSignin.signIn();
+    console.log('userinfo log: ', userInfo.data?.idToken);
+
+    if (!userInfo.data?.idToken) {
+      throw new Error('Google Sign-In Failed: No ID Token received');
+    }
+
+    const extracted = userInfo.data?.idToken;
+    const googleCredential = auth.GoogleAuthProvider.credential(extracted);
+    const userCredential = await auth().signInWithCredential(googleCredential);
+
+    console.log('user: ', userCredential.user);
+    return userInfo;
+  };
+
+  async function onAppleButtonPress() {
+    try {
+      // performs login request
+      const appleAuthRequestResponse = await appleAuth.performRequest({
+        requestedOperation: appleAuth.Operation.LOGIN,
+        // Note: it appears putting FULL_NAME first is important, see issue #293
+        requestedScopes: [appleAuth.Scope.FULL_NAME, appleAuth.Scope.EMAIL],
+      });
+
+      const {identityToken, nonce} = appleAuthRequestResponse;
+
+      if (!identityToken) {
+        throw new Error('Apple Sign-In failed: No identity token returned');
+      }
+
+      // get current authentication state for user
+      // /!\ This method must be tested on a real device. On the iOS simulator it always throws an error.
+      const credentialState = await appleAuth.getCredentialStateForUser(
+        appleAuthRequestResponse.user,
+      );
+
+      console.log('apple token log: ', appleAuthRequestResponse.identityToken);
+
+      // Create Firebase Apple Credential
+      const appleCredential = auth.AppleAuthProvider.credential(
+        identityToken,
+        nonce,
+      );
+
+      // Step 4: Sign In with Firebase
+      const userCredential = await auth().signInWithCredential(appleCredential);
+
+      console.log('Apple Sign-In Success:', userCredential.user);
+
+      // use credentialState response to ensure the user is authenticated
+      if (credentialState === appleAuth.State.AUTHORIZED) {
+        // user is authenticated
+        console.log('user is authenticated');
+      }
+    } catch (error) {
+      console.error('❌ Apple Sign-In Error:', error);
+    }
+  }
+
   return (
     <View style={styles.container}>
       <Splash_Image />
+      <TouchableOpacity
+        onPress={googleLogin}
+        style={{
+          backgroundColor: 'blue',
+          flexDirection: 'row',
+          alignItems: 'center',
+          padding: 10,
+          borderRadius: 5,
+          marginTop: 20,
+          // paddingTop: 20,
+        }}>
+        <Text>Google Signin</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        onPress={() => onAppleButtonPress()}
+        style={{
+          backgroundColor: 'white',
+          flexDirection: 'row',
+          alignItems: 'center',
+          padding: 10,
+          borderRadius: 5,
+          marginTop: 20,
+          // paddingTop: 20,
+        }}>
+        <Text style={{color: 'black'}}>Apple Sign In</Text>
+      </TouchableOpacity>
+      {/* <GoogleSigninButton
+        size={GoogleSigninButton.Size.Wide}
+        color={GoogleSigninButton.Color.Dark}
+        onPress={async () => {
+          try {
+            const response = await googleLogin();
+            const {data} = response;
+
+            console.log('idToken log: ', data?.idToken);
+
+            const extractedIdToken = data?.idToken;
+          } catch (error) {
+            console.log('error logs: ', error);
+          }
+        }}
+        disabled={false}
+      />
+      ; */}
     </View>
   );
 };

@@ -2,18 +2,22 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>CLIENT_ID</key>
+	<string>1075936012101-5l3p7niseichilfl4ntfdjhg7ftr1ptv.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.1075936012101-5l3p7niseichilfl4ntfdjhg7ftr1ptv</string>
 	<key>API_KEY</key>
-	<string>AIzaSyDKMVa1PYDHlJw13vbPD74lEr5coh-iWlQ</string>
+	<string>AIzaSyCHhD017Mno-ig_Ru6RaT-AFxILGqF6pHQ</string>
 	<key>GCM_SENDER_ID</key>
-	<string>962683619119</string>
+	<string>1075936012101</string>
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>com.cinqtech.lms</string>
+	<string>co.unnica.unnica</string>
 	<key>PROJECT_ID</key>
-	<string>sampleproject-36f20</string>
+	<string>unnica-platform</string>
 	<key>STORAGE_BUCKET</key>
-	<string>sampleproject-36f20.appspot.com</string>
+	<string>unnica-platform.firebasestorage.app</string>
 	<key>IS_ADS_ENABLED</key>
 	<false></false>
 	<key>IS_ANALYTICS_ENABLED</key>
@@ -25,8 +29,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:962683619119:ios:07e2f032a9a7d3352c83da</string>
-	<key>DATABASE_URL</key>
-	<string>https://sampleproject-36f20.firebaseio.com</string>
+	<string>1:1075936012101:ios:1dd8b02c4f21f71b37002c</string>
 </dict>
 </plist>

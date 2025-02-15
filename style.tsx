@@ -225,4 +225,34 @@ export const styles = StyleSheet.create({
     fontSize: 16,
     color: '#555',
   },
+
+  // splash unnica image
+
+  splash_image: {
+    alignSelf: 'center',
+    flexDirection: 'column',
+    width: '70%',
+    alignItems: 'center',
+  },
+  splash_image_logo: {
+    width: '70%',
+    resizeMode: 'contain',
+    height: 200,
+  },
+  splash_image_title: {
+    fontSize: 35,
+    color: Constant.themeYellowColor,
+    textAlign: 'center',
+    fontWeight: '700',
+    marginTop: 30,
+    width: '80%',
+  },
+  splash_image_subtitle: {
+    fontSize: 22,
+    color: Constant.whiteColor,
+    textAlign: 'center',
+    fontWeight: '700',
+    marginTop: 30,
+    width: '70%',
+  },
 });
