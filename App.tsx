@@ -46,6 +46,11 @@ import CardListScreen from './src/screen/CardListScreen';
 import PharmacyScreen from './src/screen/PhaarmacyScreen';
 import SplashScreen from './src/screen/SplashScreen';
 import CartScreen from './src/screen/CartListScreen';
+import SignupFormScreen from './src/screen/SignUp/SignupFormScreen';
+import GenerateUsernameScreen from './src/screen/SignUp/GenerateUsernameScreen';
+import OtpScreen from './src/screen/SignUp/OtpScreen';
+import NavigationStrings from './src/Constant/NavigationStrings';
+import ScreenWrapper from './src/components/ScreenWrapper';
 
 type SectionProps = PropsWithChildren<{
   title: string;
@@ -128,29 +133,44 @@ function App(): React.JSX.Element {
 
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="Splash">
+      <Stack.Navigator initialRouteName={NavigationStrings.SPLASH}>
         <Stack.Screen
-          name="Splash"
+          name={NavigationStrings.SPLASH}
           component={SplashScreen}
           options={{headerShown: false}}
         />
         <Stack.Screen
-          name="Welcome"
+          name={NavigationStrings.SIGNUP}
+          component={SignupFormScreen}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name={NavigationStrings.GENERATE_USERNAME}
+          component={GenerateUsernameScreen}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name={NavigationStrings.OTP}
+          component={OtpScreen}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name={NavigationStrings.WELCOME}
           component={WelcomeScreen}
           options={{headerShown: false}}
         />
         <Stack.Screen
-          name="CardList"
+          name={NavigationStrings.CARD_LIST}
           component={CardListScreen}
           options={{headerShown: false}}
         />
         <Stack.Screen
-          name="Pharmacy"
+          name={NavigationStrings.PHARMACY}
           component={PharmacyScreen}
           options={{headerShown: false}}
         />
         <Stack.Screen
-          name="Cart"
+          name={NavigationStrings.CART}
           component={CartScreen}
           options={{headerShown: false}}
         />

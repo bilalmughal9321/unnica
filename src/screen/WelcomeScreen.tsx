@@ -29,8 +29,12 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import UUID from 'react-native-uuid';
 import Toast from 'react-native-simple-toast';
 import TouchID from 'react-native-touch-id';
+import NavigationStrings from '../Constant/NavigationStrings';
 
-type WelcomeScreenProps = StackScreenProps<any, 'Welcome'>;
+type WelcomeScreenProps = StackScreenProps<
+  any,
+  typeof NavigationStrings.WELCOME
+>;
 
 const WelcomeScreen: React.FC<WelcomeScreenProps> = ({navigation}) => {
   // const dispatch = useDispatch();
@@ -218,6 +222,10 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({navigation}) => {
         navigation.navigate('Pharmacy');
       }, 4000);
 
+      if (tag != null) {
+        throw Error('');
+      }
+
       if (tag.ndefMessage && tag.ndefMessage.length > 0) {
         // Get the payload from the first NDEF record
         const payload = tag.ndefMessage[0].payload;
@@ -273,11 +281,11 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({navigation}) => {
               'to demo this react-native component',
               optionalConfigObject,
             )
-              .then(success => {
+              .then(() => {
                 // Alert.alert('Authenticated Successfully');
                 readNdef();
               })
-              .catch(error => {
+              .catch(() => {
                 // Alert.alert(`Authentication Failed: ${error}`);
               });
           }}

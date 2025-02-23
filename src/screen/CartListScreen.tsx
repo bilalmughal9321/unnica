@@ -17,8 +17,9 @@ import PoweredBy from '../components/PoweredBy';
 import {Constant, formatCardNumber, hasNotch, normalize} from '../Utils';
 import {RootState} from '../redux/store';
 import Topbar from '../components/TopBar';
+import NavigationStrings from '../Constant/NavigationStrings';
 
-type CartScreenProps = StackScreenProps<any, 'Cart'>;
+type CartScreenProps = StackScreenProps<any, typeof NavigationStrings.CART>;
 
 const CartScreen: React.FC<CartScreenProps> = ({navigation}) => {
   // Access card details from the Redux store

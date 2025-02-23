@@ -4,8 +4,12 @@ import {Text, TouchableOpacity, View} from 'react-native';
 import CreditCardListScreen from '../components/CardList';
 import {useSelector, useDispatch} from 'react-redux';
 import {RootState} from '../redux/reducer'; // RootState import karein
+import NavigationStrings from '../Constant/NavigationStrings';
 
-type CardListScreenProps = StackScreenProps<any, 'CardList'>;
+type CardListScreenProps = StackScreenProps<
+  any,
+  typeof NavigationStrings.CARD_LIST
+>;
 
 interface selectedCard {
   background: string;

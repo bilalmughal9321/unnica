@@ -1,5 +1,5 @@
-import React, {useEffect} from 'react';
-import {View, TouchableOpacity, Image, Text} from 'react-native';
+import React, {useEffect, useState} from 'react';
+import {View, TouchableOpacity, Image, Text, Alert} from 'react-native';
 import {StackScreenProps} from '@react-navigation/stack';
 import {styles} from '../../style';
 
@@ -14,8 +14,9 @@ import {
   appleAuth,
 } from '@invertase/react-native-apple-authentication';
 import auth from '@react-native-firebase/auth';
+import NavigationStrings from '../Constant/NavigationStrings';
 
-type SplashScreenProps = StackScreenProps<any, 'Splash'>;
+type SplashScreenProps = StackScreenProps<any, typeof NavigationStrings.SPLASH>;
 
 const SplashScreen: React.FC<SplashScreenProps> = ({navigation}) => {
   const optionalConfigObject = {
@@ -30,14 +31,23 @@ const SplashScreen: React.FC<SplashScreenProps> = ({navigation}) => {
     passcodeFallback: false, // iOS - allows the device to fall back to using the passcode, if faceid/touch is not available. this does not mean that if touchid/faceid fails the first few times it will revert to passcode, rather that if the former are not enrolled, then it will use the passcode.
   };
 
+  const [isLoggedIn, setLoggedIn] = useState(false);
+
   useEffect(() => {
     // const user = checkUserLogin();
     // console.log('User:', user ? 'Already logged in' : 'No user logged in');
-    // const timer = setTimeout(() => {
-    //   navigation.navigate('Welcome');
-    // }, 3000);
-    // Clear timeout on component unmount
-    // return () => clearTimeout(timer);
+
+    if (isLoggedIn) {
+      const timer = setTimeout(() => {
+        // navigation.navigate(NavigationStrings.GENERATE_USERNAME);
+      }, 3000);
+      // Clear timeout on component unmount
+      return () => clearTimeout(timer);
+    } else {
+      // Alert.alert('user is not logged in');
+
+      navigation.navigate(NavigationStrings.GENERATE_USERNAME);
+    }
   }, []);
 
   const Splash_Image = () => {
@@ -123,7 +133,7 @@ const SplashScreen: React.FC<SplashScreenProps> = ({navigation}) => {
   return (
     <View style={styles.container}>
       <Splash_Image />
-      <TouchableOpacity
+      {/* <TouchableOpacity
         onPress={googleLogin}
         style={{
           backgroundColor: 'blue',
@@ -135,9 +145,9 @@ const SplashScreen: React.FC<SplashScreenProps> = ({navigation}) => {
           // paddingTop: 20,
         }}>
         <Text>Google Signin</Text>
-      </TouchableOpacity>
+      </TouchableOpacity> */}
 
-      <TouchableOpacity
+      {/* <TouchableOpacity
         onPress={() => onAppleButtonPress()}
         style={{
           backgroundColor: 'white',
@@ -149,7 +159,7 @@ const SplashScreen: React.FC<SplashScreenProps> = ({navigation}) => {
           // paddingTop: 20,
         }}>
         <Text style={{color: 'black'}}>Apple Sign In</Text>
-      </TouchableOpacity>
+      </TouchableOpacity> */}
       {/* <GoogleSigninButton
         size={GoogleSigninButton.Size.Wide}
         color={GoogleSigninButton.Color.Dark}
