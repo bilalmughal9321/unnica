@@ -58,7 +58,10 @@ const SignupFormScreen: React.FC<SignUpProps> = ({navigation}) => {
                   style={styles.textField}
                   placeholder={english.firstName}
                   value={firstName}
-                  onChangeText={text => setFirstName(text)}
+                  onChangeText={text => {
+                    console.log('typing...');
+                    setFirstName(text);
+                  }}
                 />
 
                 <TextInput
@@ -103,7 +106,11 @@ const SignupFormScreen: React.FC<SignUpProps> = ({navigation}) => {
           </View>
         </View>
 
-        <TouchableOpacity style={styles.confirmPwd}>
+        <TouchableOpacity
+          onPress={() =>
+            navigation.navigate(NavigationStrings.GENERATE_USERNAME)
+          }
+          style={styles.confirmPwd}>
           <Text style={styles.confirmPwdText}>{english.signUpSubmitBtn}</Text>
         </TouchableOpacity>
 

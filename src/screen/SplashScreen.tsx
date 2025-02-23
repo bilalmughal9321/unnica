@@ -46,7 +46,7 @@ const SplashScreen: React.FC<SplashScreenProps> = ({navigation}) => {
     } else {
       // Alert.alert('user is not logged in');
 
-      navigation.navigate(NavigationStrings.GENERATE_USERNAME);
+      navigation.navigate(NavigationStrings.SIGNUP);
     }
   }, []);
 
