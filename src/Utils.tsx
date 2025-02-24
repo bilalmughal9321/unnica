@@ -34,3 +34,8 @@ export const normalize = (size: number) => {
   const scale = width / 375;
   return size * scale;
 };
+
+import Toast from 'react-native-simple-toast';
+export const toaster = (props: string) => {
+  Toast.show(props, Toast.SHORT);
+};

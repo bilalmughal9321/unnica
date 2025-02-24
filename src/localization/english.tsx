@@ -10,6 +10,7 @@ export const english = {
   password: 'Password',
   username: 'Username',
   number: 'Number',
+  code: 'Code',
   confirmPassword: 'Confirm password',
   signUpSubmitBtn: 'Confirm',
   dobText: 'Date of birth',

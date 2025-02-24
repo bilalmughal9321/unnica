@@ -12,11 +12,12 @@ import {
 import {RouteProp, useNavigation} from '@react-navigation/native';
 import {StackNavigationProp, StackScreenProps} from '@react-navigation/stack';
 import NavigationStrings from '../../Constant/NavigationStrings';
-import {RootStackParamList} from '../../Constant/RootStackParamList';
 import ScreenWrapper from '../../components/ScreenWrapper';
 import {Color} from '../../Constant/Color';
 import FooterText from '../../components/Footer';
 import {english} from '../../localization/english';
+import Toast from 'react-native-simple-toast';
+import {toaster} from '../../Utils';
 
 type SignUpProps = {
   navigation: StackNavigationProp<any, typeof NavigationStrings.SIGNUP>;
@@ -34,6 +35,27 @@ const SignupFormScreen: React.FC<SignUpProps> = ({navigation}) => {
       navigation.navigate('GenerateUsername', {firstName, lastName});
     } else {
       Alert.alert('Please enter your first and last name');
+    }
+  };
+
+  const submit = () => {
+    if (firstName == '') {
+      toaster('First name is missing');
+    } else if (lastName == '') {
+      toaster('First name is missing');
+    } else if (password == '') {
+      toaster('Password is missing');
+    } else if (confirmPassword == '') {
+      toaster('Confirm password is missing');
+    } else if (password != confirmPassword) {
+      toaster('Password is not match with comfirm password');
+    } else {
+      navigation.navigate(NavigationStrings.GENERATE_USERNAME, {
+        fn: firstName,
+        ln: lastName,
+        email: email,
+        password: password,
+      });
     }
   };
 
@@ -106,11 +128,7 @@ const SignupFormScreen: React.FC<SignUpProps> = ({navigation}) => {
           </View>
         </View>
 
-        <TouchableOpacity
-          onPress={() =>
-            navigation.navigate(NavigationStrings.GENERATE_USERNAME)
-          }
-          style={styles.confirmPwd}>
+        <TouchableOpacity onPress={submit} style={styles.confirmPwd}>
           <Text style={styles.confirmPwdText}>{english.signUpSubmitBtn}</Text>
         </TouchableOpacity>
 
