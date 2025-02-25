@@ -8,6 +8,9 @@ import {
   Alert,
   Image,
   TouchableOpacity,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
 } from 'react-native';
 import {RouteProp, useNavigation} from '@react-navigation/native';
 import {StackNavigationProp, StackScreenProps} from '@react-navigation/stack';
@@ -61,79 +64,81 @@ const SignupFormScreen: React.FC<SignUpProps> = ({navigation}) => {
 
   return (
     <ScreenWrapper isBackground={false}>
-      <View style={styles.container}>
-        <Image
-          style={styles.titleImage}
-          source={require('../../asset/unnica_logo.png')}
-        />
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={styles.container}>
+        <ScrollView
+          contentContainerStyle={styles.scrollView}
+          keyboardShouldPersistTaps="handled">
+          <View style={styles.innerContainer}>
+            <Image
+              style={styles.titleImage}
+              source={require('../../asset/unnica_logo.png')}
+            />
 
-        <View style={styles.box}>
-          {/* Signup Text */}
-          <View style={styles.textWrapper}>
-            <Text style={styles.text}>{english.signTitle}</Text>
-          </View>
-          <View style={{padding: 5}}>
-            {/* VStack */}
-            <View style={styles.VStackView}>
-              <View style={styles.HStackView}>
-                <TextInput
-                  style={styles.textField}
-                  placeholder={english.firstName}
-                  value={firstName}
-                  onChangeText={text => {
-                    console.log('typing...');
-                    setFirstName(text);
-                  }}
-                />
-
-                <TextInput
-                  style={styles.textField}
-                  placeholder={english.lstName}
-                  value={lastName}
-                  onChangeText={text => setLastName(text)}
-                />
+            <View style={styles.box}>
+              <View style={styles.textWrapper}>
+                <Text style={styles.text}>{english.signTitle}</Text>
               </View>
+              <View style={{padding: 5}}>
+                <View style={styles.VStackView}>
+                  <View style={styles.HStackView}>
+                    <TextInput
+                      style={styles.textField}
+                      placeholder={english.firstName}
+                      value={firstName}
+                      onChangeText={setFirstName}
+                    />
+                    <TextInput
+                      style={styles.textField}
+                      placeholder={english.lstName}
+                      value={lastName}
+                      onChangeText={setLastName}
+                    />
+                  </View>
 
-              <View style={styles.HStackView}>
-                <TextInput
-                  style={styles.textField}
-                  placeholder={english.email}
-                  value={email}
-                  onChangeText={text => setEmail(text)}
-                />
-              </View>
+                  <View style={styles.HStackView}>
+                    <TextInput
+                      style={styles.textField}
+                      placeholder={english.email}
+                      value={email}
+                      onChangeText={setEmail}
+                    />
+                  </View>
 
-              <View style={styles.HStackView}>
-                <TextInput
-                  style={styles.textField}
-                  placeholder={english.password}
-                  value={password}
-                  secureTextEntry
-                  onChangeText={text => setPassword(text)}
-                />
-              </View>
+                  <View style={styles.HStackView}>
+                    <TextInput
+                      style={styles.textField}
+                      placeholder={english.password}
+                      value={password}
+                      secureTextEntry
+                      onChangeText={setPassword}
+                    />
+                  </View>
 
-              <View style={styles.HStackView}>
-                <TextInput
-                  style={styles.textField}
-                  placeholder={english.confirmPassword}
-                  value={confirmPassword}
-                  secureTextEntry
-                  onChangeText={text => setConfirmPassword(text)}
-                />
+                  <View style={styles.HStackView}>
+                    <TextInput
+                      style={styles.textField}
+                      placeholder={english.confirmPassword}
+                      value={confirmPassword}
+                      secureTextEntry
+                      onChangeText={setConfirmPassword}
+                    />
+                  </View>
+                </View>
               </View>
             </View>
 
-            {/* HStack */}
+            <TouchableOpacity onPress={submit} style={styles.confirmPwd}>
+              <Text style={styles.confirmPwdText}>
+                {english.signUpSubmitBtn}
+              </Text>
+            </TouchableOpacity>
+
+            {/* <FooterText /> */}
           </View>
-        </View>
-
-        <TouchableOpacity onPress={submit} style={styles.confirmPwd}>
-          <Text style={styles.confirmPwdText}>{english.signUpSubmitBtn}</Text>
-        </TouchableOpacity>
-
-        <FooterText />
-      </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </ScreenWrapper>
   );
 };
@@ -141,12 +146,17 @@ const SignupFormScreen: React.FC<SignUpProps> = ({navigation}) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    // justifyContent: 'center', // Center vertically
-    alignItems: 'center', // Center horizontally
+  },
+  scrollView: {
+    flexGrow: 1,
+  },
+  innerContainer: {
+    alignItems: 'center',
+    paddingBottom: 30, // Ensures space when keyboard opens
   },
   titleImage: {
     width: '60%',
-    height: 260,
+    height: 300,
     resizeMode: 'cover',
     marginTop: 10,
   },
@@ -158,15 +168,13 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
     padding: 20,
     paddingVertical: 30,
-    position: 'relative', // Required for absolute positioning inside
+    position: 'relative',
   },
   textWrapper: {
     position: 'absolute',
-    top: -10, // Moves text above the box
+    top: -10,
     alignSelf: 'center',
-    // left: '50%',
-    // transform: [{translateX: -0}], // Centers the text
-    backgroundColor: 'white', // Hides border behind text
+    backgroundColor: 'white',
     paddingHorizontal: 10,
   },
   text: {
@@ -190,7 +198,6 @@ const styles = StyleSheet.create({
     backgroundColor: Color.textFieldColor,
     padding: 12,
     borderRadius: 20,
-    // height: 50,
   },
   confirmPwd: {
     width: '70%',

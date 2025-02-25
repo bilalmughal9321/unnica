@@ -8,6 +8,8 @@ import {
   TouchableOpacity,
   Button,
   ScrollView,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
 import {StackNavigationProp} from '@react-navigation/stack';
 import NavigationStrings from '../../Constant/NavigationStrings';
@@ -371,7 +373,7 @@ const styles = StyleSheet.create({
     backgroundColor: Color.textFieldColor,
     padding: 12,
     borderRadius: 20,
-    // height: 40,
+    height: 40,
   },
 
   textField2: {
