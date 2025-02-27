@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   View,
   Text,
@@ -12,6 +12,8 @@ import {
   Platform,
   ScrollView,
 } from 'react-native';
+import {useSelector, useDispatch} from 'react-redux';
+import {AppDispatch, RootState} from '../../redux/store';
 import {RouteProp, useNavigation} from '@react-navigation/native';
 import {StackNavigationProp, StackScreenProps} from '@react-navigation/stack';
 import NavigationStrings from '../../Constant/NavigationStrings';
@@ -21,17 +23,86 @@ import FooterText from '../../components/Footer';
 import {english} from '../../localization/english';
 import Toast from 'react-native-simple-toast';
 import {toaster} from '../../Utils';
+import {MMKV} from 'react-native-mmkv';
+import {loader} from '../../components/Loader';
+import {fetchApiData} from '../../redux/actions';
 
 type SignUpProps = {
   navigation: StackNavigationProp<any, typeof NavigationStrings.SIGNUP>;
 };
 
 const SignupFormScreen: React.FC<SignUpProps> = ({navigation}) => {
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const [firstName, setFirstName] = useState('Bilal');
+  const [lastName, setLastName] = useState('Mughal');
+  const [email, setEmail] = useState('bilal@gmail.com');
+  const [password, setPassword] = useState('bilal123');
+  const [confirmPassword, setConfirmPassword] = useState('bilal123');
+
+  const storage = new MMKV();
+  const dispatch = useDispatch<AppDispatch>();
+  const val = useSelector((state: RootState) => state.Unnica);
+
+  const phoneNumber = '+34622222222'; // Example phone number
+  const encodedPhone = encodeURIComponent(phoneNumber); // Encode the phone number
+
+  const isLoadingOTP = useSelector((state: RootState) => state);
+
+  const {load, data, err} = useSelector((state: RootState) => state.Unnica);
+
+  useEffect(() => {
+    let step = storage.getNumber('Step');
+
+    if (step == 1) {
+      let data = storage.getString('USER_DATA');
+      if (data) {
+        console.log('saved value: ', JSON.parse(data));
+        let value = JSON.parse(data);
+
+        toaster('sign up process step 1 is already completed.');
+
+        const timer = setTimeout(() => {
+          navigation.navigate(NavigationStrings.GENERATE_USERNAME, {
+            fn: value.firstName,
+            ln: value.lastName,
+            email: value.email,
+            password: value.password,
+          });
+        }, 3000);
+        // Clear timeout on component unmount
+        return () => clearTimeout(timer);
+      }
+    } else if (step == 2) {
+      let data = storage.getString('USER_DATA');
+      if (data) {
+        console.log('saved value: ', JSON.parse(data));
+        let value = JSON.parse(data);
+
+        toaster('sign up process step 1 and 2 is already completed.');
+
+        const timer = setTimeout(() => {
+          navigation.navigate(NavigationStrings.OTP, {
+            fn: value.firstName,
+            ln: value.lastName,
+            email: value.email,
+            password: value.password,
+            username: value.username,
+            dob: value.dob,
+            number: value.number,
+          });
+        }, 3000);
+        // Clear timeout on component unmount
+        return () => clearTimeout(timer);
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    console.log('value: ', load);
+  }, [load]);
+
+  useEffect(() => {
+    console.log('err: ', err);
+  }, [err]);
 
   const handleNext = () => {
     if (firstName.trim() && lastName.trim()) {
@@ -53,12 +124,35 @@ const SignupFormScreen: React.FC<SignUpProps> = ({navigation}) => {
     } else if (password != confirmPassword) {
       toaster('Password is not match with comfirm password');
     } else {
+      const userData = {
+        firstName,
+        lastName,
+        email,
+        password,
+      };
+
+      storage.set('USER_DATA', JSON.stringify(userData)); // Store object as JSON
+      storage.set('Step', 1); // Store step completion
+
+      console.log('User data saved:', userData);
+      console.log('Step 1 completed.');
+
+      toaster('STEP 1 COMPLETED');
+
       navigation.navigate(NavigationStrings.GENERATE_USERNAME, {
         fn: firstName,
         ln: lastName,
         email: email,
         password: password,
       });
+
+      // dispatch(
+      //   fetchApiData(
+      //     'GET_OTP',
+      //     `http://api.ci.unnica-dev.co/admin/otp?phone=${encodedPhone}`,
+      //     'GET',
+      //   ),
+      // );
     }
   };
 

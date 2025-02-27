@@ -1,4 +1,4 @@
-import React, {useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {
   View,
   Text,
@@ -9,19 +9,84 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
-import {useNavigation} from '@react-navigation/native';
+import {RouteProp, useNavigation} from '@react-navigation/native';
 import {StackNavigationProp} from '@react-navigation/stack';
 import NavigationStrings from '../../Constant/NavigationStrings';
 import ScreenWrapper from '../../components/ScreenWrapper';
+import {MMKV} from 'react-native-mmkv';
+import {useDispatch, useSelector} from 'react-redux';
+import {AppDispatch, RootState} from '../../redux/store';
+import {fetchApiData} from '../../redux/actions';
+import {loader} from '../../components/Loader';
+import {toaster} from '../../Utils';
 
 type OtpProps = {
   navigation: StackNavigationProp<any, typeof NavigationStrings.OTP>;
+  route: RouteProp<any, typeof NavigationStrings.OTP>;
 };
 
-const OtpScreen: React.FC<OtpProps> = ({navigation}) => {
+const OtpScreen: React.FC<OtpProps> = ({navigation, route}) => {
   const otpLength = 4;
   const [otp, setOtp] = useState(Array(otpLength).fill(''));
   const inputRefs = useRef<Array<TextInput | null>>([]);
+
+  const dispatch = useDispatch<AppDispatch>();
+  const {load, data, err} = useSelector((state: RootState) => state.Unnica);
+
+  const storage = new MMKV();
+
+  const {fn, ln, email, password, username, dob, Number} = route.params || {};
+
+  useEffect(() => {
+    let step = storage.getNumber('Step');
+    let user = storage.getString('USER_DATA');
+    if (user) {
+      let response = JSON.parse(user);
+      console.log('response: ', response);
+
+      const phoneNumber = response.number; // Example phone number
+      const encodedPhone = encodeURIComponent(phoneNumber); // Encode the phone numb
+
+      toaster('Get otp');
+
+      dispatch(
+        fetchApiData(
+          'SEND_OTP',
+          'http://api.ci.unnica-dev.co/user/send-otp',
+          'POST',
+          {
+            phone: phoneNumber,
+          },
+        ),
+      );
+
+      const timer = setTimeout(() => {
+        toaster('verify otp');
+        dispatch(
+          fetchApiData(
+            'VERIFY_OTP',
+            `http://api.ci.unnica-dev.co/admin/otp?phone=${encodedPhone}`,
+            'GET',
+          ),
+        );
+      }, 5000);
+      // Clear timeout on component unmount
+      return () => clearTimeout(timer);
+    }
+  }, []);
+
+  useEffect(() => {
+    console.log('load: ', load);
+  }, [load]);
+
+  useEffect(() => {
+    console.log('data: ', data.VERIFY_OTP);
+
+    if (data.VERIFY_OTP != null) {
+      const otpArray = data.VERIFY_OTP.data.split('');
+      setOtp(otpArray);
+    }
+  }, [data.VERIFY_OTP]);
 
   const handleChange = (text: string, index: number) => {
     if (text.length > 1) return;
@@ -47,6 +112,7 @@ const OtpScreen: React.FC<OtpProps> = ({navigation}) => {
 
   return (
     <ScreenWrapper isBackground={true}>
+      {load && loader()}
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.flex}>

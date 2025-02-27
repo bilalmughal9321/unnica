@@ -114,10 +114,67 @@ const CardReducer = (state = cardInitialState, action: CardAction) => {
 
 // # ========================================================================================== #
 
+//  New Work
+
+import * as request from './actionTypes';
+
+interface ApiState2 {
+  load: boolean;
+  err: {[key: string]: string | null};
+  data: {[key: string]: any};
+}
+
+const startState: ApiState2 = {
+  load: false,
+  err: {},
+  data: {},
+};
+
+const unnicaReducer = (state = startState, action: any) => {
+  const {apiType, data, error} = action.payload || {};
+
+  switch (action.type) {
+    case 'API_REQUEST':
+      const newState = {
+        ...state,
+        load: true,
+        err: {...state.err, [apiType]: null},
+      };
+
+      console.log('🔵 After Update:', newState.load);
+      return newState;
+
+    case 'API_SUCCESS':
+      return {
+        ...state,
+        load: false,
+        data: {...state.data, [apiType]: data},
+      };
+
+    case 'API_FAILURE':
+      console.log('🟡 Before Update:', state.err);
+      console.log('🟢 Updating load state for:', apiType);
+
+      const newState2 = {
+        ...state,
+        load: false,
+        err: {...state.err, [apiType]: error},
+      };
+
+      console.log('🔵 After Update:', newState2.err);
+
+      return newState2;
+
+    default:
+      return state;
+  }
+};
+
 const rootReducer = combineReducers({
-  counterReducer: exampleReducer,
-  cardReducer: CardReducer,
-  ApiReducer: apiReducer,
+  // counterReducer: exampleReducer,
+  // cardReducer: CardReducer,
+  // ApiReducer: apiReducer,
+  Unnica: unnicaReducer,
 });
 
 export type RootState = ReturnType<typeof rootReducer>;

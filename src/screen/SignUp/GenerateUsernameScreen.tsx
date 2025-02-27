@@ -10,6 +10,7 @@ import {
   ScrollView,
   KeyboardAvoidingView,
   Platform,
+  ActivityIndicator,
 } from 'react-native';
 import {StackNavigationProp} from '@react-navigation/stack';
 import NavigationStrings from '../../Constant/NavigationStrings';
@@ -19,6 +20,8 @@ import {english} from '../../localization/english';
 import DatePicker from 'react-native-date-picker';
 import {RouteProp} from '@react-navigation/native';
 import {text} from 'stream/consumers';
+import {toaster} from '../../Utils';
+import {MMKV} from 'react-native-mmkv';
 
 type GeneratedUsernameProps = {
   navigation: StackNavigationProp<
@@ -37,25 +40,26 @@ const GenerateUsernameScreen: React.FC<GeneratedUsernameProps> = ({
   const [lastName, setLastName] = useState('');
   const [username, setUsername] = useState('');
   const [number, setNumber] = useState('');
-  const [dob, setDob] = useState('');
+  const [dob, setDob] = useState('Click to add dob');
   const [code, setCode] = useState('');
+  const [Picker, setPicker] = useState(false);
   const [date, setDate] = useState(new Date());
   const [open, setOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const storage = new MMKV();
 
-  const {fn, ln, email, password} = route.params || {}; // Default empty object
+  const {fn, ln, email, password} = route.params || {};
 
   useEffect(() => {
-    setFirstName(fn);
-    setLastName(ln);
+    if (fn) setFirstName(fn);
+    if (ln) setLastName(ln);
+  }, [fn, ln]); // Depend on fn and ln
 
-    generateRandomUsername();
-
-    setLoggedIn(false);
-    const timer = setTimeout(() => {
-      setLoggedIn(true);
-    }, 1000);
-    return () => clearTimeout(timer);
-  }, []);
+  useEffect(() => {
+    if (firstName && lastName) {
+      generateRandomUsername();
+    }
+  }, [firstName, lastName]); // Depend on firstName and lastName
 
   const ImageLogo = () => {
     return (
@@ -70,22 +74,20 @@ const GenerateUsernameScreen: React.FC<GeneratedUsernameProps> = ({
   };
 
   const generateRandomUsername = useCallback(() => {
-    console.log(fn);
-    console.log(ln);
     if (firstName && lastName) {
+      setIsLoading(true); // Show loader
       const randomNum = Math.floor(Math.random() * 10000000) + 1;
-      setUsername(`${firstName}_${lastName}_${randomNum}`);
+
+      setTimeout(() => {
+        setUsername(`${firstName}_${lastName}_${randomNum}`);
+        setIsLoading(false); // Hide loader after 1 sec
+      }, 1000);
     }
   }, [firstName, lastName]);
 
   const handleFname = (props: any) => {
     setFirstName(props);
   };
-
-  // const handleFname = useCallback((props: any) => {
-  //   console.log('sss: ', props.text);
-  //   setFirstName(props.text);
-  // }, []);
 
   const handleLname = useCallback((props: any) => {
     setLastName(props);
@@ -126,6 +128,39 @@ const GenerateUsernameScreen: React.FC<GeneratedUsernameProps> = ({
     };
 
     return `${day}${getDaySuffix(day)} ${month}, ${year}`;
+  };
+
+  const onSubmit = () => {
+    if (username == '') {
+      toaster('username is missing');
+    } else if (!Picker) {
+      toaster('date of birth is missing');
+    } else if (number == '') {
+      toaster('number is missing');
+    } else {
+      const userData = {
+        fn,
+        ln,
+        email,
+        password,
+        username,
+        dob,
+        number,
+      };
+
+      storage.set('USER_DATA', JSON.stringify(userData));
+      storage.set('Step', 2);
+
+      navigation.navigate(NavigationStrings.OTP, {
+        fn: fn,
+        ln: ln,
+        email: email,
+        password: password,
+        username: username,
+        dob: dob,
+        number: number,
+      });
+    }
   };
 
   return (
@@ -190,13 +225,20 @@ const GenerateUsernameScreen: React.FC<GeneratedUsernameProps> = ({
                       {english.username}
                     </Text>
                     <View style={[styles.textField, {flex: 1}]}>
-                      <TextInput
-                        // style={styles.textField}
-                        style={{flex: 10}}
-                        placeholder={english.username}
-                        value={username}
-                        onChangeText={handleUsername}
-                      />
+                      {isLoading ? (
+                        <ActivityIndicator
+                          size="small"
+                          color="black"
+                          style={{marginRight: 10, flex: 1}}
+                        />
+                      ) : (
+                        <TextInput
+                          style={{flex: 1}}
+                          placeholder={english.username}
+                          value={username}
+                          editable={false} // Disable editing
+                        />
+                      )}
                       <TouchableOpacity
                         onPress={() => generateRandomUsername()}
                         style={styles.penImageTouchableOpacity}>
@@ -264,9 +306,7 @@ const GenerateUsernameScreen: React.FC<GeneratedUsernameProps> = ({
             </View>
           </View>
 
-          <TouchableOpacity
-            onPress={() => navigation.navigate(NavigationStrings.OTP)}
-            style={styles.confirmPwd}>
+          <TouchableOpacity onPress={onSubmit} style={styles.confirmPwd}>
             <Text style={styles.confirmPwdText}>{english.signUpSubmitBtn}</Text>
           </TouchableOpacity>
 
@@ -277,14 +317,9 @@ const GenerateUsernameScreen: React.FC<GeneratedUsernameProps> = ({
             mode="date"
             maximumDate={new Date()}
             onConfirm={date => {
+              setPicker(true); // check if the picker is open for the first time
               setOpen(false);
               setDate(date);
-
-              // console.log(date);
-              // const formattedDate = `${date.getDate()}-${
-              //   date.getMonth() + 1
-              // }-${date.getFullYear()}`;
-              // console.log(formattedDate);
               setDob(getFormattedDate(date));
             }}
             onCancel={() => {
