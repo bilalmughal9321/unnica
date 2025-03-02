@@ -20,7 +20,7 @@ import {english} from '../../localization/english';
 import DatePicker from 'react-native-date-picker';
 import {RouteProp} from '@react-navigation/native';
 import {text} from 'stream/consumers';
-import {toaster} from '../../Utils';
+import {isValidUSPhoneNumber, toaster} from '../../Utils';
 import {MMKV} from 'react-native-mmkv';
 
 type GeneratedUsernameProps = {
@@ -41,7 +41,7 @@ const GenerateUsernameScreen: React.FC<GeneratedUsernameProps> = ({
   const [username, setUsername] = useState('');
   const [number, setNumber] = useState('');
   const [dob, setDob] = useState('Click to add dob');
-  const [code, setCode] = useState('');
+  const [code, setCode] = useState('+1');
   const [Picker, setPicker] = useState(false);
   const [date, setDate] = useState(new Date());
   const [open, setOpen] = useState(false);
@@ -138,6 +138,13 @@ const GenerateUsernameScreen: React.FC<GeneratedUsernameProps> = ({
     } else if (number == '') {
       toaster('number is missing');
     } else {
+      const fullNumber = `${code} ${number}`;
+
+      if (!isValidUSPhoneNumber(fullNumber)) {
+        toaster('Wrong Number');
+        return;
+      }
+
       const userData = {
         fn,
         ln,
@@ -145,8 +152,10 @@ const GenerateUsernameScreen: React.FC<GeneratedUsernameProps> = ({
         password,
         username,
         dob,
-        number,
+        fullNumber,
       };
+
+      console.log('USER_DATA: ', userData);
 
       storage.set('USER_DATA', JSON.stringify(userData));
       storage.set('Step', 2);
@@ -158,7 +167,7 @@ const GenerateUsernameScreen: React.FC<GeneratedUsernameProps> = ({
         password: password,
         username: username,
         dob: dob,
-        number: number,
+        number: fullNumber,
       });
     }
   };
@@ -320,7 +329,8 @@ const GenerateUsernameScreen: React.FC<GeneratedUsernameProps> = ({
               setPicker(true); // check if the picker is open for the first time
               setOpen(false);
               setDate(date);
-              setDob(getFormattedDate(date));
+              const formattedDate = date.toLocaleDateString('en-GB'); // "DD/MM/YYYY" format
+              setDob(formattedDate);
             }}
             onCancel={() => {
               setOpen(false);

@@ -49,6 +49,14 @@ export const fetchApiData = (
   return async (dispatch: any) => {
     dispatch(apiRequest(apiType));
 
+    var requestBody = {
+      url: url,
+      method: method,
+      body: body,
+    };
+
+    console.log('request body: ', requestBody);
+
     try {
       const response = await fetch(url, {
         method,
@@ -56,16 +64,20 @@ export const fetchApiData = (
         headers: {'Content-Type': 'application/json'},
       });
 
+      console.log('response: ' + response);
+
       const data = await response.json();
 
-      console.log('response: ' + data.code);
-
-      if (apiType == 'GET_OTP' && data.code == 409) {
-        dispatch(apiFailure(apiType, 'There is not otp for this number'));
-      } else if (apiType == 'SEND_OTP' && data.code != 200) {
-        dispatch(apiFailure(apiType, 'Error in sending otp'));
+      if (data.code == undefined) {
+        dispatch(apiFailure(apiType, data.error));
       } else {
-        dispatch(apiSuccess(apiType, data));
+        if (apiType == 'GET_OTP' && data.code == 409) {
+          dispatch(apiFailure(apiType, 'There is not otp for this number'));
+        } else if (apiType == 'SEND_OTP' && data.code != 200) {
+          dispatch(apiFailure(apiType, 'Error in sending otp'));
+        } else {
+          dispatch(apiSuccess(apiType, data));
+        }
       }
     } catch (error) {
       dispatch(apiFailure(apiType, 'error message'));

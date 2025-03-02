@@ -39,3 +39,27 @@ import Toast from 'react-native-simple-toast';
 export const toaster = (props: string) => {
   Toast.show(props, Toast.SHORT);
 };
+
+export const formatDate = (dateString: string) => {
+  // 28th feb, 2025 -> 28/02/2025
+  const date = new Date(dateString);
+  return date.toLocaleDateString('en-GB'); // "en-GB" format return DD/MM/YYYY
+};
+
+//  Clear Local Data
+export const clearData: boolean = true;
+
+// Check validity of US number
+export const isValidUSPhoneNumber = (phone: string) => {
+  const regex = /^\+1\s\d{10}$/;
+  return regex.test(phone);
+};
+
+export const formatUSPhoneNumber = (phone: string) => {
+  console.log('phone: ', phone);
+  const regex = /^\+1\s?(\d{3})(\d{3})(\d{4})$/;
+
+  if (!regex.test(phone)) return 'Invalid number format';
+
+  return phone.replace(regex, '+1 ($1) $2-$3');
+};

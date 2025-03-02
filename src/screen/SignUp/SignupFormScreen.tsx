@@ -22,7 +22,7 @@ import {Color} from '../../Constant/Color';
 import FooterText from '../../components/Footer';
 import {english} from '../../localization/english';
 import Toast from 'react-native-simple-toast';
-import {toaster} from '../../Utils';
+import {clearData, toaster} from '../../Utils';
 import {MMKV} from 'react-native-mmkv';
 import {loader} from '../../components/Loader';
 import {fetchApiData} from '../../redux/actions';
@@ -50,6 +50,10 @@ const SignupFormScreen: React.FC<SignUpProps> = ({navigation}) => {
   const {load, data, err} = useSelector((state: RootState) => state.Unnica);
 
   useEffect(() => {
+    if (clearData) {
+      storage.clearAll();
+    }
+
     let step = storage.getNumber('Step');
 
     if (step == 1) {
@@ -96,13 +100,13 @@ const SignupFormScreen: React.FC<SignUpProps> = ({navigation}) => {
     }
   }, []);
 
-  useEffect(() => {
-    console.log('value: ', load);
-  }, [load]);
+  // useEffect(() => {
+  //   console.log('value: ', load);
+  // }, [load]);
 
-  useEffect(() => {
-    console.log('err: ', err);
-  }, [err]);
+  // useEffect(() => {
+  //   console.log('err: ', err);
+  // }, [err]);
 
   const handleNext = () => {
     if (firstName.trim() && lastName.trim()) {

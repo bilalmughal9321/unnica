@@ -51,6 +51,8 @@ import GenerateUsernameScreen from './src/screen/SignUp/GenerateUsernameScreen';
 import OtpScreen from './src/screen/SignUp/OtpScreen';
 import NavigationStrings from './src/Constant/NavigationStrings';
 import ScreenWrapper from './src/components/ScreenWrapper';
+import SignUpSuccess from './src/screen/SignUp/signSuccess';
+import SocialSignupScreen from './src/screen/SignUp/SocialSignup';
 
 type SectionProps = PropsWithChildren<{
   title: string;
@@ -132,51 +134,63 @@ function App(): React.JSX.Element {
   };
 
   return (
-    <NavigationContainer>
-      <Stack.Navigator initialRouteName={NavigationStrings.SPLASH}>
-        <Stack.Screen
-          name={NavigationStrings.SPLASH}
-          component={SplashScreen}
-          options={{headerShown: false}}
-        />
-        <Stack.Screen
-          name={NavigationStrings.SIGNUP}
-          component={SignupFormScreen}
-          options={{headerShown: false}}
-        />
-        <Stack.Screen
-          name={NavigationStrings.GENERATE_USERNAME}
-          component={GenerateUsernameScreen}
-          options={{headerShown: false}}
-        />
-        <Stack.Screen
-          name={NavigationStrings.OTP}
-          component={OtpScreen}
-          options={{headerShown: false}}
-        />
-        <Stack.Screen
-          name={NavigationStrings.WELCOME}
-          component={WelcomeScreen}
-          options={{headerShown: false}}
-        />
-        <Stack.Screen
-          name={NavigationStrings.CARD_LIST}
-          component={CardListScreen}
-          options={{headerShown: false}}
-        />
-        <Stack.Screen
-          name={NavigationStrings.PHARMACY}
-          component={PharmacyScreen}
-          options={{headerShown: false}}
-        />
-        <Stack.Screen
-          name={NavigationStrings.CART}
-          component={CartScreen}
-          options={{headerShown: false}}
-        />
-        <Stack.Screen name="Drawer" component={DrawerNavigator} />
-      </Stack.Navigator>
-    </NavigationContainer>
+    <ScreenWrapper isBackground>
+      <NavigationContainer>
+        <Stack.Navigator initialRouteName={NavigationStrings.SPLASH}>
+          <Stack.Screen
+            name={NavigationStrings.SPLASH}
+            component={SplashScreen}
+            options={{headerShown: false}}
+          />
+          <Stack.Screen
+            name={NavigationStrings.SIGNUP}
+            component={SignupFormScreen}
+            options={{headerShown: false}}
+          />
+          <Stack.Screen
+            name={NavigationStrings.SOCIALSIGNUP}
+            component={SocialSignupScreen}
+            options={{headerShown: false}}
+          />
+          <Stack.Screen
+            name={NavigationStrings.GENERATE_USERNAME}
+            component={GenerateUsernameScreen}
+            options={{headerShown: false}}
+          />
+          <Stack.Screen
+            name={NavigationStrings.OTP}
+            component={OtpScreen}
+            options={{headerShown: false}}
+          />
+          <Stack.Screen
+            name={NavigationStrings.SIGNUP_SUCCESS}
+            component={SignUpSuccess}
+            options={{headerShown: false}}
+          />
+          <Stack.Screen
+            name={NavigationStrings.WELCOME}
+            component={WelcomeScreen}
+            options={{headerShown: false}}
+          />
+          <Stack.Screen
+            name={NavigationStrings.CARD_LIST}
+            component={CardListScreen}
+            options={{headerShown: false}}
+          />
+          <Stack.Screen
+            name={NavigationStrings.PHARMACY}
+            component={PharmacyScreen}
+            options={{headerShown: false}}
+          />
+          <Stack.Screen
+            name={NavigationStrings.CART}
+            component={CartScreen}
+            options={{headerShown: false}}
+          />
+          <Stack.Screen name="Drawer" component={DrawerNavigator} />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </ScreenWrapper>
   );
 }
 

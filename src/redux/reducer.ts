@@ -121,13 +121,18 @@ import * as request from './actionTypes';
 interface ApiState2 {
   load: boolean;
   err: {[key: string]: string | null};
-  data: {[key: string]: any};
+  // data: {[key: string]: any | string};
+  data: {
+    VERIFY_OTP: {data: string} | null;
+    SIGNUP: {data: string} | null;
+    SEND_OTP: {data: string} | null;
+  };
 }
 
 const startState: ApiState2 = {
   load: false,
   err: {},
-  data: {},
+  data: {VERIFY_OTP: null, SIGNUP: null, SEND_OTP: null},
 };
 
 const unnicaReducer = (state = startState, action: any) => {
@@ -135,25 +140,38 @@ const unnicaReducer = (state = startState, action: any) => {
 
   switch (action.type) {
     case 'API_REQUEST':
+      console.log('');
+      console.log('🟡🟡🟡🟡🟡🟡🟡🟡');
+      console.log('State:', apiType);
       const newState = {
         ...state,
         load: true,
         err: {...state.err, [apiType]: null},
       };
-
-      console.log('🔵 After Update:', newState.load);
       return newState;
 
     case 'API_SUCCESS':
-      return {
+      console.log('');
+      console.log('🟢🟢🟢🟢🟢🟢🟢🟢');
+      console.log('State:', apiType);
+      console.log('Before Update:', state.data);
+
+      const newState3 = {
         ...state,
         load: false,
         data: {...state.data, [apiType]: data},
       };
 
+      console.log('After:', newState3.data);
+      console.log('');
+
+      return newState3;
+
     case 'API_FAILURE':
-      console.log('🟡 Before Update:', state.err);
-      console.log('🟢 Updating load state for:', apiType);
+      console.log('');
+      console.log('🔴🔴🔴🔴🔴🔴🔴🔴');
+      console.log('State:', apiType);
+      console.log('Before Update:', state.data);
 
       const newState2 = {
         ...state,
@@ -161,7 +179,8 @@ const unnicaReducer = (state = startState, action: any) => {
         err: {...state.err, [apiType]: error},
       };
 
-      console.log('🔵 After Update:', newState2.err);
+      console.log('After:', newState2.err);
+      console.log('');
 
       return newState2;
 
