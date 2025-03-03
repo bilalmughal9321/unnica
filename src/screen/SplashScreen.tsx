@@ -37,17 +37,15 @@ const SplashScreen: React.FC<SplashScreenProps> = ({navigation}) => {
     // const user = checkUserLogin();
     // console.log('User:', user ? 'Already logged in' : 'No user logged in');
 
-    if (isLoggedIn) {
-      const timer = setTimeout(() => {
-        // navigation.navigate(NavigationStrings.GENERATE_USERNAME);
-      }, 3000);
-      // Clear timeout on component unmount
-      return () => clearTimeout(timer);
-    } else {
-      // Alert.alert('user is not logged in');
-
+    // if (isLoggedIn) {
+    const timer = setTimeout(() => {
       navigation.navigate(NavigationStrings.SOCIALSIGNUP);
-    }
+    }, 3000);
+    // Clear timeout on component unmount
+    return () => clearTimeout(timer);
+    // } else {
+    //   // Alert.alert('user is not logged in');
+    // }
   }, []);
 
   const Splash_Image = () => {

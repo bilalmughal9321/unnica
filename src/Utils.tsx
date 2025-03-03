@@ -47,7 +47,7 @@ export const formatDate = (dateString: string) => {
 };
 
 //  Clear Local Data
-export const clearData: boolean = true;
+export const clearData: boolean = false;
 
 // Check validity of US number
 export const isValidUSPhoneNumber = (phone: string) => {

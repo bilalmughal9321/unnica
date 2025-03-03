@@ -32,11 +32,11 @@ type SignUpProps = {
 };
 
 const SignupFormScreen: React.FC<SignUpProps> = ({navigation}) => {
-  const [firstName, setFirstName] = useState('Bilal');
-  const [lastName, setLastName] = useState('Mughal');
-  const [email, setEmail] = useState('bilal@gmail.com');
-  const [password, setPassword] = useState('bilal123');
-  const [confirmPassword, setConfirmPassword] = useState('bilal123');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
 
   const storage = new MMKV();
   const dispatch = useDispatch<AppDispatch>();
@@ -232,10 +232,9 @@ const SignupFormScreen: React.FC<SignUpProps> = ({navigation}) => {
                 {english.signUpSubmitBtn}
               </Text>
             </TouchableOpacity>
-
-            {/* <FooterText /> */}
           </View>
         </ScrollView>
+        <FooterText />
       </KeyboardAvoidingView>
     </ScreenWrapper>
   );

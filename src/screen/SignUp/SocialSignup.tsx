@@ -30,6 +30,7 @@ import {
   GoogleSignin,
   GoogleSigninButton,
   statusCodes,
+  User,
 } from '@react-native-google-signin/google-signin';
 import {
   AppleButton,
@@ -41,6 +42,9 @@ type SocialSignupProps = {
 };
 
 const SocialSignupScreen: React.FC<SocialSignupProps> = ({navigation}) => {
+  const dispatch = useDispatch<AppDispatch>();
+  const {load, data} = useSelector((state: RootState) => state.Unnica);
+
   const googleLogin = async () => {
     GoogleSignin.configure({
       webClientId:
@@ -48,7 +52,7 @@ const SocialSignupScreen: React.FC<SocialSignupProps> = ({navigation}) => {
     });
     await GoogleSignin.hasPlayServices();
     const userInfo = await GoogleSignin.signIn();
-    console.log('userinfo log: ', userInfo.data?.idToken);
+    // console.log('userinfo log: ', userInfo.data?.idToken);
 
     if (!userInfo.data?.idToken) {
       throw new Error('Google Sign-In Failed: No ID Token received');
@@ -58,9 +62,72 @@ const SocialSignupScreen: React.FC<SocialSignupProps> = ({navigation}) => {
     // const googleCredential = auth.GoogleAuthProvider.credential(extracted);
     // const userCredential = await auth().signInWithCredential(googleCredential);
 
-    console.log('user: ', userInfo.data);
+    // console.log('user: ', userInfo.data);
+
+    console.log('first name: ', userInfo.data.user.givenName);
+    console.log('last name: ', userInfo.data?.user.familyName);
+    console.log('email: ', userInfo.data?.user.email);
+    console.log(
+      'username: ',
+      `${userInfo.data?.user.name}_${userInfo.data?.user.familyName}_${userInfo.data?.user.id}`,
+    );
+    console.log('dob: ', '');
+    console.log('phone: ');
+    console.log('idToken: ', userInfo.data?.idToken);
+    console.log('isSocial: ', true);
+
+    let fname = userInfo.data.user.givenName;
+    let lname = userInfo.data?.user.familyName;
+    let email = userInfo.data?.user.email;
+    let username = `${userInfo.data?.user.name}_${userInfo.data?.user.familyName}_${userInfo.data?.user.id}`;
+    let token = userInfo.data?.idToken;
+    let isSocial = true;
+
+    // dispatchApi(fname, lname, email, username, token, isSocial);
+
+    setTimeout(() => {}, 5000);
+
+    dispatch(
+      fetchApiData(
+        'SIGNUP',
+        `http://api.ci.unnica-dev.co/user/signup?p=1`,
+        'POST',
+        {
+          firstName: fname,
+          lastName: lname,
+          email: email,
+          username: username,
+          idToken: token,
+          isSocial: isSocial,
+        },
+      ),
+    );
+
     return userInfo;
   };
+
+  const dispatchApi = (
+    fname: string | null,
+    lname: string | null,
+    email: string,
+    username: string,
+    token: string,
+    social: boolean,
+  ) => {
+    // let fname = data.user.givenName;
+    // let lname = data?.user.familyName;
+    // let email = data?.user.email;
+    // let username = `${data?.user.name}_${data?.user.familyName}_${data?.user.id}`;
+    // let token = data?.idToken;
+    // let isSocial = true;
+  };
+
+  useEffect(() => {
+    if (data.SIGNUP) {
+      toaster('Account has been created');
+      navigation.navigate(NavigationStrings.SIGNUP_SUCCESS);
+    }
+  }, [data.SIGNUP]);
 
   async function onAppleButtonPress() {
     try {
@@ -84,12 +151,38 @@ const SocialSignupScreen: React.FC<SocialSignupProps> = ({navigation}) => {
       );
 
       console.log('apple token log: ', appleAuthRequestResponse.identityToken);
+      console.log('apple token log: ', appleAuthRequestResponse);
+
+      let fname = appleAuthRequestResponse.fullName?.givenName;
+      let lname = appleAuthRequestResponse.fullName?.familyName;
+      let email = appleAuthRequestResponse.email;
+      let username = `${appleAuthRequestResponse.fullName?.givenName}_${appleAuthRequestResponse.fullName?.familyName}_${appleAuthRequestResponse.user}`;
+      let token = appleAuthRequestResponse.identityToken;
+      let isSocial = true;
+
+      setTimeout(() => {
+        dispatch(
+          fetchApiData(
+            'SIGNUP',
+            `http://api.ci.unnica-dev.co/user/signup?p=1`,
+            'POST',
+            {
+              firstName: fname,
+              lastName: lname,
+              email: email,
+              username: username,
+              idToken: token,
+              isSocial: isSocial,
+            },
+          ),
+        );
+      }, 3000);
 
       // Create Firebase Apple Credential
-      //   const appleCredential = auth.AppleAuthProvider.credential(
-      //     identityToken,
-      //     nonce,
-      //   );
+      // const appleCredential = auth.AppleAuthProvider.credential(
+      //   identityToken,
+      //   nonce,
+      // );
 
       // Step 4: Sign In with Firebase
       //   const userCredential = await auth().signInWithCredential(appleCredential);
@@ -138,6 +231,7 @@ const SocialSignupScreen: React.FC<SocialSignupProps> = ({navigation}) => {
 
   return (
     <ScreenWrapper isBackground={false}>
+      {load && loader()}
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.container}>
