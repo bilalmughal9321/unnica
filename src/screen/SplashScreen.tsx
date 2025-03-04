@@ -39,7 +39,7 @@ const SplashScreen: React.FC<SplashScreenProps> = ({navigation}) => {
 
     // if (isLoggedIn) {
     const timer = setTimeout(() => {
-      navigation.navigate(NavigationStrings.SOCIALSIGNUP);
+      navigation.navigate(NavigationStrings.SIGNUP);
     }, 3000);
     // Clear timeout on component unmount
     return () => clearTimeout(timer);

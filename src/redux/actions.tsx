@@ -22,7 +22,7 @@ export const actions = {
 
 //  NEW WORK
 
-import {API_REQUEST, API_SUCCESS, API_FAILURE} from './actionTypes';
+import {API_REQUEST, API_SUCCESS, API_FAILURE, API_RESET} from './actionTypes';
 
 export const apiRequest = (apiType: string) => ({
   type: API_REQUEST,
@@ -37,6 +37,11 @@ export const apiSuccess = (apiType: string, data: any) => ({
 export const apiFailure = (apiType: string, error: string) => ({
   type: API_FAILURE,
   payload: {apiType, error},
+});
+
+export const apiReset = (apiType: string) => ({
+  type: API_RESET,
+  payload: {apiType},
 });
 
 // ✅ Asynchronous API Call (No Change Required)
@@ -64,21 +69,26 @@ export const fetchApiData = (
         headers: {'Content-Type': 'application/json'},
       });
 
-      console.log('response: ' + response);
-
       const data = await response.json();
 
-      if (data.code == undefined) {
-        dispatch(apiFailure(apiType, data.error));
+      if (data.code != undefined && data.code == 200) {
+        dispatch(apiSuccess(apiType, data));
       } else {
-        if (apiType == 'GET_OTP' && data.code == 409) {
-          dispatch(apiFailure(apiType, 'There is not otp for this number'));
-        } else if (apiType == 'SEND_OTP' && data.code != 200) {
-          dispatch(apiFailure(apiType, 'Error in sending otp'));
-        } else {
-          dispatch(apiSuccess(apiType, data));
-        }
+        dispatch(apiFailure(apiType, data));
       }
+
+      // if (data.code == undefined) {
+      //   dispatch(apiFailure(apiType, data.error));
+      // } else {
+      // if (apiType == 'GET_OTP' && data.code == 409) {
+      //   dispatch(apiFailure(apiType, 'There is not otp for this number'));
+      // } else if (apiType == 'SEND_OTP' && data.code != 200) {
+      //   dispatch(apiFailure(apiType, 'Error in sending otp'));
+      // }
+      // else {
+      //   dispatch(apiSuccess(apiType, data));
+      // }
+      // }
     } catch (error) {
       dispatch(apiFailure(apiType, 'error message'));
     }

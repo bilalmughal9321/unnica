@@ -117,21 +117,26 @@ const CardReducer = (state = cardInitialState, action: CardAction) => {
 //  New Work
 
 import * as request from './actionTypes';
+import {apiErrorModel, apiModel} from '../Constant/models';
 
 interface ApiState2 {
   load: boolean;
-  err: {[key: string]: string | null};
+  err: {
+    VERIFY_OTP: {data: string} | null;
+    SIGNUP: {data: any} | null;
+    SEND_OTP: {data: any} | null;
+  };
   // data: {[key: string]: any | string};
   data: {
     VERIFY_OTP: {data: string} | null;
-    SIGNUP: {data: string} | null;
+    SIGNUP: {data: any} | null;
     SEND_OTP: {data: string} | null;
   };
 }
 
 const startState: ApiState2 = {
   load: false,
-  err: {},
+  err: {VERIFY_OTP: null, SIGNUP: null, SEND_OTP: null},
   data: {VERIFY_OTP: null, SIGNUP: null, SEND_OTP: null},
 };
 
@@ -139,7 +144,7 @@ const unnicaReducer = (state = startState, action: any) => {
   const {apiType, data, error} = action.payload || {};
 
   switch (action.type) {
-    case 'API_REQUEST':
+    case request.API_REQUEST:
       console.log('');
       console.log('🟡🟡🟡🟡🟡🟡🟡🟡');
       console.log('State:', apiType);
@@ -150,7 +155,7 @@ const unnicaReducer = (state = startState, action: any) => {
       };
       return newState;
 
-    case 'API_SUCCESS':
+    case request.API_SUCCESS:
       console.log('');
       console.log('🟢🟢🟢🟢🟢🟢🟢🟢');
       console.log('State:', apiType);
@@ -167,7 +172,7 @@ const unnicaReducer = (state = startState, action: any) => {
 
       return newState3;
 
-    case 'API_FAILURE':
+    case request.API_FAILURE:
       console.log('');
       console.log('🔴🔴🔴🔴🔴🔴🔴🔴');
       console.log('State:', apiType);
@@ -183,6 +188,25 @@ const unnicaReducer = (state = startState, action: any) => {
       console.log('');
 
       return newState2;
+
+    case request.API_RESET:
+      console.log('');
+      console.log('🔵🔵🔵🔵🔵🔵🔵🔵');
+      console.log('State:', apiType);
+      console.log('Before Update Data:', state.data);
+      console.log('Before Update Err:', state.err);
+
+      const newState4 = {
+        ...state,
+        load: false,
+        data: {VERIFY_OTP: null, SIGNUP: null, SEND_OTP: null},
+        err: {VERIFY_OTP: null, SIGNUP: null, SEND_OTP: null},
+      };
+
+      console.log('After data:', newState4.data);
+      console.log('After Error:', newState4.err);
+
+      return newState4;
 
     default:
       return state;

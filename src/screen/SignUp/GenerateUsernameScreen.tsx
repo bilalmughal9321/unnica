@@ -22,6 +22,10 @@ import {RouteProp} from '@react-navigation/native';
 import {text} from 'stream/consumers';
 import {isValidUSPhoneNumber, toaster} from '../../Utils';
 import {MMKV} from 'react-native-mmkv';
+import {useSelector, useDispatch} from 'react-redux';
+import {AppDispatch, RootState} from '../../redux/store';
+import {apiReset, fetchApiData} from '../../redux/actions';
+import {API_ACTIONS} from '../../Constant/apiActionTypes';
 
 type GeneratedUsernameProps = {
   navigation: StackNavigationProp<
@@ -40,7 +44,7 @@ const GenerateUsernameScreen: React.FC<GeneratedUsernameProps> = ({
   const [lastName, setLastName] = useState('');
   const [username, setUsername] = useState('');
   const [number, setNumber] = useState('');
-  const [dob, setDob] = useState('Click to add dob');
+  const [dob, setDob] = useState('Date of birth');
   const [code, setCode] = useState('+1');
   const [Picker, setPicker] = useState(false);
   const [date, setDate] = useState(new Date());
@@ -50,16 +54,19 @@ const GenerateUsernameScreen: React.FC<GeneratedUsernameProps> = ({
 
   const {fn, ln, email, password} = route.params || {};
 
+  const dispatch = useDispatch<AppDispatch>();
+  const {load, data, err} = useSelector((state: RootState) => state.Unnica);
+
   useEffect(() => {
     if (fn) setFirstName(fn);
     if (ln) setLastName(ln);
   }, [fn, ln]); // Depend on fn and ln
 
-  useEffect(() => {
-    if (firstName && lastName) {
-      generateRandomUsername();
-    }
-  }, [firstName, lastName]); // Depend on firstName and lastName
+  // useEffect(() => {
+  //   if (firstName && lastName) {
+  //     generateRandomUsername();
+  //   }
+  // }, [firstName, lastName]);
 
   const ImageLogo = () => {
     return (
@@ -94,7 +101,7 @@ const GenerateUsernameScreen: React.FC<GeneratedUsernameProps> = ({
   }, []);
 
   const handleUsername = useCallback((props: any) => {
-    setFirstName(props);
+    setUsername(props);
   }, []);
 
   const handleCode = useCallback((props: any) => {
@@ -138,12 +145,34 @@ const GenerateUsernameScreen: React.FC<GeneratedUsernameProps> = ({
     } else if (number == '') {
       toaster('number is missing');
     } else {
-      const fullNumber = `${code} ${number}`;
+      const fullNumber = `${code}${number}`;
 
       if (!isValidUSPhoneNumber(fullNumber)) {
         toaster('Wrong Number');
         return;
       }
+
+      dispatch(
+        fetchApiData(
+          'SIGNUP',
+          `http://api.ci.unnica-dev.co/user/signup?p=2`,
+          'POST',
+          {
+            firstName: firstName,
+            lastName: lastName,
+            username: username,
+            dob: dob,
+            phone: fullNumber,
+            isSocial: false,
+          },
+        ),
+      );
+    }
+  };
+
+  useEffect(() => {
+    if (data.SIGNUP) {
+      let fullNumber = `${code}${number}`;
 
       const userData = {
         fn,
@@ -155,7 +184,7 @@ const GenerateUsernameScreen: React.FC<GeneratedUsernameProps> = ({
         fullNumber,
       };
 
-      console.log('USER_DATA: ', userData);
+      dispatch(apiReset(API_ACTIONS.SIGNUP));
 
       storage.set('USER_DATA', JSON.stringify(userData));
       storage.set('Step', 2);
@@ -167,10 +196,17 @@ const GenerateUsernameScreen: React.FC<GeneratedUsernameProps> = ({
         password: password,
         username: username,
         dob: dob,
-        number: fullNumber,
+        number: `${code} ${number}`,
       });
     }
-  };
+  }, [data.SIGNUP]);
+
+  useEffect(() => {
+    if (err.SIGNUP) {
+      toaster(err.SIGNUP.msg);
+      dispatch(apiReset(API_ACTIONS.SIGNUP));
+    }
+  }, [err.SIGNUP]);
 
   return (
     <ScreenWrapper isBackground={true}>
@@ -244,8 +280,9 @@ const GenerateUsernameScreen: React.FC<GeneratedUsernameProps> = ({
                         <TextInput
                           style={{flex: 1}}
                           placeholder={english.username}
+                          onChangeText={handleUsername}
                           value={username}
-                          editable={false} // Disable editing
+                          editable={true}
                         />
                       )}
                       <TouchableOpacity

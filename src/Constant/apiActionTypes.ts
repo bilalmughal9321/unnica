@@ -1,0 +1,5 @@
+export const API_ACTIONS = {
+  VERIFY_OTP: 'VERIFY_OTP',
+  SIGNUP: 'SIGNUP',
+  SEND_OTP: 'SEND_OTP',
+};

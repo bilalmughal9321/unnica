@@ -25,18 +25,19 @@ import Toast from 'react-native-simple-toast';
 import {clearData, toaster} from '../../Utils';
 import {MMKV} from 'react-native-mmkv';
 import {loader} from '../../components/Loader';
-import {fetchApiData} from '../../redux/actions';
+import {apiReset, fetchApiData} from '../../redux/actions';
+import {API_ACTIONS} from '../../Constant/apiActionTypes';
 
 type SignUpProps = {
   navigation: StackNavigationProp<any, typeof NavigationStrings.SIGNUP>;
 };
 
 const SignupFormScreen: React.FC<SignUpProps> = ({navigation}) => {
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const [firstName, setFirstName] = useState('bilal');
+  const [lastName, setLastName] = useState('mughal');
+  const [email, setEmail] = useState('bilal@gmail.com');
+  const [password, setPassword] = useState('123');
+  const [confirmPassword, setConfirmPassword] = useState('123');
 
   const storage = new MMKV();
   const dispatch = useDispatch<AppDispatch>();
@@ -50,9 +51,9 @@ const SignupFormScreen: React.FC<SignUpProps> = ({navigation}) => {
   const {load, data, err} = useSelector((state: RootState) => state.Unnica);
 
   useEffect(() => {
-    // if (clearData) {
-    //   storage.clearAll();
-    // }
+    if (clearData) {
+      storage.clearAll();
+    }
 
     let step = storage.getNumber('Step');
 
@@ -146,7 +147,10 @@ const SignupFormScreen: React.FC<SignUpProps> = ({navigation}) => {
           `http://api.ci.unnica-dev.co/user/signup?p=1`,
           'POST',
           {
+            firstName: firstName,
+            lastName: lastName,
             email: email,
+            isSocial: false,
           },
         ),
       );
@@ -172,8 +176,32 @@ const SignupFormScreen: React.FC<SignUpProps> = ({navigation}) => {
     }
   };
 
+  // *************** Check Signup response *******************
+
+  useEffect(() => {
+    if (data.SIGNUP) {
+      toaster('signup part 1 is completed');
+      dispatch(apiReset('SIGNUP'));
+      navigation.navigate(NavigationStrings.GENERATE_USERNAME, {
+        fn: firstName,
+        ln: lastName,
+        email: email,
+        password: password,
+      });
+    }
+  }, [data.SIGNUP]);
+
+  useEffect(() => {
+    if (err.SIGNUP) {
+      console.log(err.SIGNUP);
+      toaster(err.SIGNUP.msg);
+      dispatch(apiReset(API_ACTIONS.SIGNUP));
+    }
+  }, [err.SIGNUP]);
+
   return (
     <ScreenWrapper isBackground={false}>
+      {load && loader()}
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.container}>

@@ -47,11 +47,11 @@ export const formatDate = (dateString: string) => {
 };
 
 //  Clear Local Data
-export const clearData: boolean = false;
+export const clearData: boolean = true;
 
 // Check validity of US number
 export const isValidUSPhoneNumber = (phone: string) => {
-  const regex = /^\+1\s\d{10}$/;
+  const regex = /^\+1\d{10}$/;
   return regex.test(phone);
 };
 
