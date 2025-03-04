@@ -386,7 +386,7 @@ const OtpScreen: React.FC<OtpProps> = ({navigation, route}) => {
       setNumber(fullNumber);
       setDOB(dob);
       setPhoneNumber(fullNumber);
-      otpHandling(fullNumber);
+      // otpHandling(fullNumber);
     }
   }, []);
 

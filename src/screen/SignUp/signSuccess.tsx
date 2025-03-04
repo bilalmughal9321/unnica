@@ -17,7 +17,7 @@ const SignUpSuccess: React.FC<OtpProps> = ({navigation, route}) => {
   const storage = new MMKV();
 
   useEffect(() => {
-    storage.set('Step', 0);
+    storage.clearAll();
   });
 
   return (

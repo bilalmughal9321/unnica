@@ -45,6 +45,10 @@ const SocialSignupScreen: React.FC<SocialSignupProps> = ({navigation}) => {
   const dispatch = useDispatch<AppDispatch>();
   const {load, data} = useSelector((state: RootState) => state.Unnica);
 
+  const storage = new MMKV();
+
+  useEffect(() => {});
+
   const googleLogin = async () => {
     GoogleSignin.configure({
       webClientId:

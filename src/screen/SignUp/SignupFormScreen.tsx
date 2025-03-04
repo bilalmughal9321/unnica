@@ -50,9 +50,9 @@ const SignupFormScreen: React.FC<SignUpProps> = ({navigation}) => {
   const {load, data, err} = useSelector((state: RootState) => state.Unnica);
 
   useEffect(() => {
-    if (clearData) {
-      storage.clearAll();
-    }
+    // if (clearData) {
+    //   storage.clearAll();
+    // }
 
     let step = storage.getNumber('Step');
 
@@ -139,16 +139,28 @@ const SignupFormScreen: React.FC<SignUpProps> = ({navigation}) => {
       storage.set('Step', 1); // Store step completion
 
       console.log('User data saved:', userData);
-      console.log('Step 1 completed.');
 
-      toaster('STEP 1 COMPLETED');
+      dispatch(
+        fetchApiData(
+          'SIGNUP',
+          `http://api.ci.unnica-dev.co/user/signup?p=1`,
+          'POST',
+          {
+            email: email,
+          },
+        ),
+      );
 
-      navigation.navigate(NavigationStrings.GENERATE_USERNAME, {
-        fn: firstName,
-        ln: lastName,
-        email: email,
-        password: password,
-      });
+      // console.log('Step 1 completed.');
+
+      // toaster('STEP 1 COMPLETED');
+
+      // navigation.navigate(NavigationStrings.GENERATE_USERNAME, {
+      //   fn: firstName,
+      //   ln: lastName,
+      //   email: email,
+      //   password: password,
+      // });
 
       // dispatch(
       //   fetchApiData(
