@@ -208,6 +208,32 @@ const unnicaReducer = (state = startState, action: any) => {
 
       return newState4;
 
+    case request.LOADER_START_REQUEST:
+      console.log('🟣🟣🟣🟣🟣🟣🟣🟣');
+      console.log('before data:', state);
+      const newState5 = {
+        ...state,
+        load: true,
+      };
+
+      console.log('🟣🟣🟣🟣🟣🟣🟣🟣');
+      console.log('After data:', newState5);
+
+      return newState5;
+
+    case request.LOADER_END_REQUEST:
+      console.log('🟣🟣🟣🟣🟣🟣🟣🟣');
+      console.log('before data:', state);
+      const newState6 = {
+        ...state,
+        load: false,
+      };
+
+      console.log('🟣🟣🟣🟣🟣🟣🟣🟣');
+      console.log('After data:', newState6);
+
+      return newState6;
+
     default:
       return state;
   }

@@ -14,6 +14,8 @@ export const SEND_OTP = 'SEND_OTP';
 export const SEND_OTP_RESP = 'SEND_OTP_RESP';
 export const SEND_OTP_ERR = 'SEND_OTP_ERR';
 
+export const LOADER_START_REQUEST = 'LOADER_START_REQUEST';
+export const LOADER_END_REQUEST = 'LOADER_END_REQUEST';
 export const API_REQUEST = 'API_REQUEST';
 export const API_SUCCESS = 'API_SUCCESS';
 export const API_FAILURE = 'API_FAILURE';

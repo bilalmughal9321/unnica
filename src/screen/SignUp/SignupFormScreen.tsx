@@ -25,7 +25,12 @@ import Toast from 'react-native-simple-toast';
 import {clearData, toaster} from '../../Utils';
 import {MMKV} from 'react-native-mmkv';
 import {loader} from '../../components/Loader';
-import {apiReset, fetchApiData} from '../../redux/actions';
+import {
+  apiReset,
+  endLoader,
+  fetchApiData,
+  startLoader,
+} from '../../redux/actions';
 import {API_ACTIONS} from '../../Constant/apiActionTypes';
 
 type SignUpProps = {
@@ -36,8 +41,8 @@ const SignupFormScreen: React.FC<SignUpProps> = ({navigation}) => {
   const [firstName, setFirstName] = useState('bilal');
   const [lastName, setLastName] = useState('mughal');
   const [email, setEmail] = useState('bilal@gmail.com');
-  const [password, setPassword] = useState('123');
-  const [confirmPassword, setConfirmPassword] = useState('123');
+  const [password, setPassword] = useState('mughal123');
+  const [confirmPassword, setConfirmPassword] = useState('mughal123');
 
   const storage = new MMKV();
   const dispatch = useDispatch<AppDispatch>();
@@ -54,6 +59,8 @@ const SignupFormScreen: React.FC<SignUpProps> = ({navigation}) => {
     if (clearData) {
       storage.clearAll();
     }
+
+    dispatch(endLoader());
 
     let step = storage.getNumber('Step');
 
@@ -124,6 +131,8 @@ const SignupFormScreen: React.FC<SignUpProps> = ({navigation}) => {
       toaster('First name is missing');
     } else if (password == '') {
       toaster('Password is missing');
+    } else if (password.length <= 5) {
+      toaster('Password must be 6 character long');
     } else if (confirmPassword == '') {
       toaster('Confirm password is missing');
     } else if (password != confirmPassword) {

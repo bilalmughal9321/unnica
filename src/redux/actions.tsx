@@ -22,25 +22,33 @@ export const actions = {
 
 //  NEW WORK
 
-import {API_REQUEST, API_SUCCESS, API_FAILURE, API_RESET} from './actionTypes';
+import * as request from './actionTypes';
+
+export const startLoader = () => ({
+  type: request.LOADER_START_REQUEST,
+});
+
+export const endLoader = () => ({
+  type: request.LOADER_END_REQUEST,
+});
 
 export const apiRequest = (apiType: string) => ({
-  type: API_REQUEST,
+  type: request.API_REQUEST,
   payload: {apiType},
 });
 
 export const apiSuccess = (apiType: string, data: any) => ({
-  type: API_SUCCESS,
+  type: request.API_SUCCESS,
   payload: {apiType, data},
 });
 
 export const apiFailure = (apiType: string, error: string) => ({
-  type: API_FAILURE,
+  type: request.API_FAILURE,
   payload: {apiType, error},
 });
 
 export const apiReset = (apiType: string) => ({
-  type: API_RESET,
+  type: request.API_RESET,
   payload: {apiType},
 });
 

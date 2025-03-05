@@ -337,6 +337,7 @@ import {
   ScrollView,
   KeyboardAvoidingView,
   Platform,
+  AppState,
 } from 'react-native';
 import {RouteProp, useNavigation} from '@react-navigation/native';
 import {StackNavigationProp} from '@react-navigation/stack';
@@ -345,11 +346,16 @@ import ScreenWrapper from '../../components/ScreenWrapper';
 import {MMKV} from 'react-native-mmkv';
 import {useDispatch, useSelector} from 'react-redux';
 import {AppDispatch, RootState} from '../../redux/store';
-import {fetchApiData} from '../../redux/actions';
+import {
+  apiRequest,
+  endLoader,
+  fetchApiData,
+  startLoader,
+} from '../../redux/actions';
 import {loader} from '../../components/Loader';
 import {formatUSPhoneNumber, toaster} from '../../Utils';
 import {API_ACTIONS} from '../../Constant/apiActionTypes';
-import auth from '@react-native-firebase/auth';
+import auth, {FirebaseAuthTypes} from '@react-native-firebase/auth';
 import {english} from '../../localization/english';
 import {Color} from '../../Constant/Color';
 
@@ -371,6 +377,8 @@ const OtpScreen: React.FC<OtpProps> = ({navigation, route}) => {
   const [getUser, setUser] = useState('');
   const [getNumber, setNumber] = useState('');
   const [getdob, setDOB] = useState('Click to add dob');
+  const [getToken, setToken] = useState('');
+  const [appState, setAppState] = useState(AppState.currentState);
 
   const dispatch = useDispatch<AppDispatch>();
   const {load, data} = useSelector((state: RootState) => state.Unnica);
@@ -391,6 +399,7 @@ const OtpScreen: React.FC<OtpProps> = ({navigation, route}) => {
       setDOB(dob);
       setPhoneNumber(fullNumber);
       otpHandling(fullNumber);
+      signUp(email, password);
 
       let users = {
         fn: fn,
@@ -416,24 +425,90 @@ const OtpScreen: React.FC<OtpProps> = ({navigation, route}) => {
   }, [data.VERIFY_OTP]);
 
   useEffect(() => {
+    if (appState == 'background') {
+      signInAndDeleteUser(getEmail, getPwd);
+    } else if (appState == 'active') {
+      signUp(getEmail, getPwd);
+    }
+  }, [appState]);
+
+  useEffect(() => {
     if (data.SIGNUP) {
       toaster('Account has been created');
       navigation.navigate(NavigationStrings.SIGNUP_SUCCESS);
     }
   }, [data.SIGNUP]);
 
+  useEffect(() => {
+    const subscription = AppState.addEventListener('change', nextAppState => {
+      console.log('App State Changed: ', nextAppState);
+
+      setAppState(nextAppState);
+    });
+
+    return () => {
+      subscription.remove();
+    };
+  }, []);
+
   const signUp = async (email: string, password: string) => {
+    dispatch(startLoader());
     try {
       const userCredential = await auth().createUserWithEmailAndPassword(
         email,
         password,
       );
       const idToken = await userCredential.user.getIdToken(); // Get ID Token
-      console.log(userCredential.user);
+      // console.log(userCredential.user);
       console.log(idToken);
-      return {user: userCredential.user, token: idToken};
+      setToken(idToken);
+
+      dispatch(endLoader());
+      // return {user: userCredential.user, token: idToken};
     } catch (error) {
       throw error;
+    }
+  };
+
+  const signInAndDeleteUser = async (email: string, password: string) => {
+    dispatch(startLoader());
+    try {
+      const user = await signInUser(email, password); // Step 1: Sign In
+      await deleteUser(user); // Step 2: Delete User
+    } catch (error) {
+      dispatch(endLoader());
+      console.error('Operation failed:', error);
+    }
+  };
+
+  const signInUser = async (email: string, password: string) => {
+    try {
+      const userCredential = await auth().signInWithEmailAndPassword(
+        email,
+        password,
+      );
+      console.log('User signed in successfully:', userCredential.user.email);
+      return userCredential.user; // Return user object
+    } catch (error) {
+      dispatch(endLoader());
+      console.error('Error signing in:', error);
+      throw error;
+    }
+  };
+
+  const deleteUser = async (user: FirebaseAuthTypes.User) => {
+    try {
+      if (user) {
+        await user.delete(); // Delete user
+        dispatch(endLoader());
+        console.log('User deleted successfully!');
+      } else {
+        dispatch(endLoader());
+        console.log('No user is logged in.');
+      }
+    } catch (error) {
+      dispatch(endLoader());
+      console.error('Error deleting user:', error);
     }
   };
 
@@ -465,12 +540,11 @@ const OtpScreen: React.FC<OtpProps> = ({navigation, route}) => {
 
   const handleCompleteOtp = (otpArray: Array<string>, token: string | null) => {
     if (otpArray.every(item => item !== '')) {
-      setTimeout(() => handleSignup(otpArray, token), 4000);
+      setTimeout(() => handleSignup(), 4000);
     }
   };
 
-  const handleSignup = (otpArray: Array<string>, token: string | null) => {
-    console.log('token: ', token);
+  const handleSignup = () => {
     if (
       !getFn ||
       !getLn ||
@@ -494,8 +568,8 @@ const OtpScreen: React.FC<OtpProps> = ({navigation, route}) => {
             username: getUser,
             dob: getdob,
             phone: phoneNumber,
-            otp: otpArray.join(''),
-            idToken: token,
+            otp: otp.join(''),
+            idToken: getToken,
             isSocial: false,
           },
         ),
@@ -507,9 +581,8 @@ const OtpScreen: React.FC<OtpProps> = ({navigation, route}) => {
     if (text.length > 1) return;
     const newOtp = [...otp];
     newOtp[index] = text;
+    const otpArray = newOtp[index].split('');
     setOtp(newOtp);
-    let firebasetoken = signUp(getEmail, getPwd);
-    handleCompleteOtp(newOtp, firebasetoken.token);
     if (text && index < otpLength - 1) {
       inputRefs.current[index + 1]?.focus();
     }
@@ -549,29 +622,7 @@ const OtpScreen: React.FC<OtpProps> = ({navigation, route}) => {
               </TouchableOpacity>
             </View>
 
-            <TouchableOpacity
-              onPress={async () => {
-                // let firebasetoken = signUp(getEmail, getPwd);
-                // handleCompleteOtp(otp, firebasetoken.token);
-
-                try {
-                  const userCredential =
-                    await auth().createUserWithEmailAndPassword(
-                      getEmail,
-                      getPwd,
-                    );
-                  const idToken = await userCredential.user.getIdToken(); // Get ID Token
-                  console.log(userCredential.user);
-                  console.log(idToken);
-
-                  handleCompleteOtp(otp, idToken);
-
-                  return {user: userCredential.user, token: idToken};
-                } catch (error) {
-                  throw error;
-                }
-              }}
-              style={styles.confirmPwd}>
+            <TouchableOpacity onPress={handleSignup} style={styles.confirmPwd}>
               <Text style={styles.confirmPwdText}>
                 {english.signUpSubmitBtn}
               </Text>
