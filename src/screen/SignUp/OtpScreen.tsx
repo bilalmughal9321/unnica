@@ -348,6 +348,10 @@ import {AppDispatch, RootState} from '../../redux/store';
 import {fetchApiData} from '../../redux/actions';
 import {loader} from '../../components/Loader';
 import {formatUSPhoneNumber, toaster} from '../../Utils';
+import {API_ACTIONS} from '../../Constant/apiActionTypes';
+import auth from '@react-native-firebase/auth';
+import {english} from '../../localization/english';
+import {Color} from '../../Constant/Color';
 
 type OtpProps = {
   navigation: StackNavigationProp<any, typeof NavigationStrings.OTP>;
@@ -386,7 +390,7 @@ const OtpScreen: React.FC<OtpProps> = ({navigation, route}) => {
       setNumber(fullNumber);
       setDOB(dob);
       setPhoneNumber(fullNumber);
-      // otpHandling(fullNumber);
+      otpHandling(fullNumber);
 
       let users = {
         fn: fn,
@@ -405,7 +409,9 @@ const OtpScreen: React.FC<OtpProps> = ({navigation, route}) => {
     if (data.VERIFY_OTP) {
       const otpArray = data.VERIFY_OTP.data.split('');
       setOtp(otpArray);
-      handleCompleteOtp(otpArray);
+      // let firebasetoken = signUp(getEmail, getPwd);
+
+      // handleCompleteOtp(otpArray, firebasetoken.token);
     }
   }, [data.VERIFY_OTP]);
 
@@ -416,12 +422,27 @@ const OtpScreen: React.FC<OtpProps> = ({navigation, route}) => {
     }
   }, [data.SIGNUP]);
 
+  const signUp = async (email: string, password: string) => {
+    try {
+      const userCredential = await auth().createUserWithEmailAndPassword(
+        email,
+        password,
+      );
+      const idToken = await userCredential.user.getIdToken(); // Get ID Token
+      console.log(userCredential.user);
+      console.log(idToken);
+      return {user: userCredential.user, token: idToken};
+    } catch (error) {
+      throw error;
+    }
+  };
+
   const otpHandling = (phone: string) => {
     if (!phone) return;
     toaster('Get OTP');
     dispatch(
       fetchApiData(
-        'SEND_OTP',
+        API_ACTIONS.SEND_OTP,
         'http://api.ci.unnica-dev.co/user/send-otp',
         'POST',
         {phone},
@@ -431,7 +452,7 @@ const OtpScreen: React.FC<OtpProps> = ({navigation, route}) => {
       toaster('Verify OTP');
       dispatch(
         fetchApiData(
-          'VERIFY_OTP',
+          API_ACTIONS.VERIFY_OTP,
           `http://api.ci.unnica-dev.co/admin/otp?phone=${encodeURIComponent(
             phone,
           )}`,
@@ -442,13 +463,14 @@ const OtpScreen: React.FC<OtpProps> = ({navigation, route}) => {
     return () => clearTimeout(timer);
   };
 
-  const handleCompleteOtp = (otpArray: Array<string>) => {
+  const handleCompleteOtp = (otpArray: Array<string>, token: string | null) => {
     if (otpArray.every(item => item !== '')) {
-      setTimeout(() => handleSignup(otpArray), 5000);
+      setTimeout(() => handleSignup(otpArray, token), 4000);
     }
   };
 
-  const handleSignup = (otpArray: Array<string>) => {
+  const handleSignup = (otpArray: Array<string>, token: string | null) => {
+    console.log('token: ', token);
     if (
       !getFn ||
       !getLn ||
@@ -458,12 +480,12 @@ const OtpScreen: React.FC<OtpProps> = ({navigation, route}) => {
       !getdob ||
       !phoneNumber
     ) {
-      toaster('Some required fields are missing!');
+      toaster('Some required fields are missing');
     } else {
       dispatch(
         fetchApiData(
           'SIGNUP',
-          `http://api.ci.unnica-dev.co/user/signup?p=1`,
+          `http://api.ci.unnica-dev.co/user/signup?p=3`,
           'POST',
           {
             firstName: getFn,
@@ -473,6 +495,7 @@ const OtpScreen: React.FC<OtpProps> = ({navigation, route}) => {
             dob: getdob,
             phone: phoneNumber,
             otp: otpArray.join(''),
+            idToken: token,
             isSocial: false,
           },
         ),
@@ -485,7 +508,8 @@ const OtpScreen: React.FC<OtpProps> = ({navigation, route}) => {
     const newOtp = [...otp];
     newOtp[index] = text;
     setOtp(newOtp);
-    handleCompleteOtp(newOtp);
+    let firebasetoken = signUp(getEmail, getPwd);
+    handleCompleteOtp(newOtp, firebasetoken.token);
     if (text && index < otpLength - 1) {
       inputRefs.current[index + 1]?.focus();
     }
@@ -524,6 +548,34 @@ const OtpScreen: React.FC<OtpProps> = ({navigation, route}) => {
                 </Text>
               </TouchableOpacity>
             </View>
+
+            <TouchableOpacity
+              onPress={async () => {
+                // let firebasetoken = signUp(getEmail, getPwd);
+                // handleCompleteOtp(otp, firebasetoken.token);
+
+                try {
+                  const userCredential =
+                    await auth().createUserWithEmailAndPassword(
+                      getEmail,
+                      getPwd,
+                    );
+                  const idToken = await userCredential.user.getIdToken(); // Get ID Token
+                  console.log(userCredential.user);
+                  console.log(idToken);
+
+                  handleCompleteOtp(otp, idToken);
+
+                  return {user: userCredential.user, token: idToken};
+                } catch (error) {
+                  throw error;
+                }
+              }}
+              style={styles.confirmPwd}>
+              <Text style={styles.confirmPwdText}>
+                {english.signUpSubmitBtn}
+              </Text>
+            </TouchableOpacity>
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
@@ -607,6 +659,21 @@ const styles = StyleSheet.create({
     color: 'gray',
     fontWeight: 'bold',
     marginTop: 10,
+  },
+  confirmPwd: {
+    width: '70%',
+    borderRadius: 20,
+    backgroundColor: Color.themeOrangeColor,
+    alignSelf: 'center',
+    alignItems: 'center',
+    marginTop: 20,
+    padding: 10,
+  },
+  confirmPwdText: {
+    fontWeight: '500',
+    color: 'black',
+    textAlign: 'center',
+    fontSize: 20,
   },
 });
 
