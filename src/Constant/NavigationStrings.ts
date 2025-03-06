@@ -1,6 +1,7 @@
 const NavigationStrings = {
   SPLASH: 'Splash',
   SIGNUP: 'Signup',
+  SIGNIN: 'Signin',
   SOCIALSIGNUP: 'SOCIALSIGNUP',
   GENERATE_USERNAME: 'GenerateUsername',
   OTP: 'Otp',

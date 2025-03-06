@@ -283,7 +283,7 @@ const SocialSignupScreen: React.FC<SocialSignupProps> = ({navigation}) => {
                   <View style={styles.HStackView}>
                     <TouchableOpacity
                       onPress={() =>
-                        navigation.navigate(NavigationStrings.SIGNUP)
+                        navigation.navigate(NavigationStrings.SIGNIN)
                       }
                       style={{flex: 1}}>
                       <Text style={[styles.text, {textAlign: 'center'}]}>
