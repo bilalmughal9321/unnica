@@ -125,19 +125,21 @@ interface ApiState2 {
     VERIFY_OTP: {data: string} | null;
     SIGNUP: {data: any} | null;
     SEND_OTP: {data: any} | null;
+    SIGNIN: {data: any} | null;
   };
   // data: {[key: string]: any | string};
   data: {
     VERIFY_OTP: {data: string} | null;
     SIGNUP: {data: any} | null;
+    SIGNIN: {data: any} | null;
     SEND_OTP: {data: string} | null;
   };
 }
 
 const startState: ApiState2 = {
   load: false,
-  err: {VERIFY_OTP: null, SIGNUP: null, SEND_OTP: null},
-  data: {VERIFY_OTP: null, SIGNUP: null, SEND_OTP: null},
+  err: {VERIFY_OTP: null, SIGNUP: null, SEND_OTP: null, SIGNIN: null},
+  data: {VERIFY_OTP: null, SIGNUP: null, SEND_OTP: null, SIGNIN: null},
 };
 
 const unnicaReducer = (state = startState, action: any) => {
@@ -199,8 +201,8 @@ const unnicaReducer = (state = startState, action: any) => {
       const newState4 = {
         ...state,
         load: false,
-        data: {VERIFY_OTP: null, SIGNUP: null, SEND_OTP: null},
-        err: {VERIFY_OTP: null, SIGNUP: null, SEND_OTP: null},
+        data: {VERIFY_OTP: null, SIGNUP: null, SEND_OTP: null, SIGNIN: null},
+        err: {VERIFY_OTP: null, SIGNUP: null, SEND_OTP: null, SIGNIN: null},
       };
 
       console.log('After data:', newState4.data);

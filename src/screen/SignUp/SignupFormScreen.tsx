@@ -38,11 +38,11 @@ type SignUpProps = {
 };
 
 const SignupFormScreen: React.FC<SignUpProps> = ({navigation}) => {
-  const [firstName, setFirstName] = useState('bilal');
-  const [lastName, setLastName] = useState('mughal');
-  const [email, setEmail] = useState('bilal@gmail.com');
-  const [password, setPassword] = useState('mughal123');
-  const [confirmPassword, setConfirmPassword] = useState('mughal123');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
 
   const storage = new MMKV();
   const dispatch = useDispatch<AppDispatch>();
@@ -225,7 +225,7 @@ const SignupFormScreen: React.FC<SignUpProps> = ({navigation}) => {
 
             <View style={styles.box}>
               <View style={styles.textWrapper}>
-                <Text style={styles.text}>{english.signTitle}</Text>
+                <Text style={styles.text}>{english.signUpTitle}</Text>
               </View>
               <View style={{padding: 5}}>
                 <View style={styles.VStackView}>

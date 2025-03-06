@@ -3,7 +3,8 @@ export const english = {
   sayHello: 'Say hello to a new way of shopping',
 
   // signup, Username
-  signTitle: 'Sign up',
+  signUpTitle: 'Sign up',
+  signInTitle: 'Login in',
   firstName: 'First Name',
   lstName: 'Last Name',
   email: 'Email',

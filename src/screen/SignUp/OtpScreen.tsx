@@ -435,7 +435,10 @@ const OtpScreen: React.FC<OtpProps> = ({navigation, route}) => {
   useEffect(() => {
     if (data.SIGNUP) {
       toaster('Account has been created');
-      navigation.navigate(NavigationStrings.SIGNUP_SUCCESS);
+      navigation.reset({
+        index: 0, // Set index to 1 (0-based index), keeping Splash at index 0 and Screen1 at index 1
+        routes: [{name: NavigationStrings.SIGNIN}],
+      });
     }
   }, [data.SIGNUP]);
 

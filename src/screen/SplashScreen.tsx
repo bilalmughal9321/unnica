@@ -39,7 +39,12 @@ const SplashScreen: React.FC<SplashScreenProps> = ({navigation}) => {
 
     // if (isLoggedIn) {
     const timer = setTimeout(() => {
-      navigation.navigate(NavigationStrings.SOCIALSIGNUP);
+      // navigation.navigate(NavigationStrings.SIGNIN);
+
+      navigation.reset({
+        index: 0, // Set index to 1 (0-based index), keeping Splash at index 0 and Screen1 at index 1
+        routes: [{name: NavigationStrings.SIGNIN}],
+      });
     }, 3000);
     // Clear timeout on component unmount
     return () => clearTimeout(timer);
@@ -50,16 +55,14 @@ const SplashScreen: React.FC<SplashScreenProps> = ({navigation}) => {
 
   const Splash_Image = () => {
     return (
-      <TouchableOpacity
-        onPress={() => navigation.navigate('Welcome')}
-        style={[styles.splash_image]}>
+      <View style={[styles.splash_image]}>
         <Image
           source={require('../asset/new/Logo.png')}
           style={styles.splash_image_logo}
         />
         <Text style={styles.splash_image_title}>{english.unnicaTitle}</Text>
         <Text style={styles.splash_image_subtitle}>{english.sayHello}</Text>
-      </TouchableOpacity>
+      </View>
     );
   };
 
