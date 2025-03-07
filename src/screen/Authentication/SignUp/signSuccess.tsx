@@ -2,11 +2,11 @@ import React, {useEffect} from 'react';
 import {View, Text, StyleSheet, Image} from 'react-native';
 import {RouteProp} from '@react-navigation/native';
 import {StackNavigationProp} from '@react-navigation/stack';
-import {Color} from '../../Constant/Color';
-import {english} from '../../localization/english';
+import {Color} from '../../../Constant/Color';
+import {english} from '../../../localization/english';
 import {MMKV} from 'react-native-mmkv';
-import NavigationStrings from '../../Constant/NavigationStrings';
-import ScreenWrapper from '../../components/ScreenWrapper';
+import NavigationStrings from '../../../Constant/NavigationStrings';
+import ScreenWrapper from '../../../components/ScreenWrapper';
 
 type OtpProps = {
   navigation: StackNavigationProp<any, typeof NavigationStrings.SIGNUP_SUCCESS>;

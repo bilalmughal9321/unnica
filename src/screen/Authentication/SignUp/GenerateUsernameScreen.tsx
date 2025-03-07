@@ -13,19 +13,19 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import {StackNavigationProp} from '@react-navigation/stack';
-import NavigationStrings from '../../Constant/NavigationStrings';
-import ScreenWrapper from '../../components/ScreenWrapper';
-import {Color} from '../../Constant/Color';
-import {english} from '../../localization/english';
+import NavigationStrings from '../../../Constant/NavigationStrings';
+import ScreenWrapper from '../../../components/ScreenWrapper';
+import {Color} from '../../../Constant/Color';
+import {english} from '../../../localization/english';
 import DatePicker from 'react-native-date-picker';
 import {RouteProp} from '@react-navigation/native';
 import {text} from 'stream/consumers';
-import {isValidUSPhoneNumber, toaster} from '../../Utils';
+import {isValidUSPhoneNumber, toaster} from '../../../Utils';
 import {MMKV} from 'react-native-mmkv';
 import {useSelector, useDispatch} from 'react-redux';
-import {AppDispatch, RootState} from '../../redux/store';
-import {apiReset, fetchApiData} from '../../redux/actions';
-import {API_ACTIONS} from '../../Constant/apiActionTypes';
+import {AppDispatch, RootState} from '../../../redux/store';
+import {apiReset, fetchApiData} from '../../../redux/actions';
+import {API_ACTIONS} from '../../../Constant/apiActionTypes';
 
 type GeneratedUsernameProps = {
   navigation: StackNavigationProp<
@@ -203,7 +203,7 @@ const GenerateUsernameScreen: React.FC<GeneratedUsernameProps> = ({
 
   useEffect(() => {
     if (err.SIGNUP) {
-      toaster(err.SIGNUP.msg);
+      // toaster(err.SIGNUP.msg);
       dispatch(apiReset(API_ACTIONS.SIGNUP));
     }
   }, [err.SIGNUP]);

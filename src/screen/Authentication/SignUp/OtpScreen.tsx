@@ -341,23 +341,23 @@ import {
 } from 'react-native';
 import {RouteProp, useNavigation} from '@react-navigation/native';
 import {StackNavigationProp} from '@react-navigation/stack';
-import NavigationStrings from '../../Constant/NavigationStrings';
-import ScreenWrapper from '../../components/ScreenWrapper';
+import NavigationStrings from '../../../Constant/NavigationStrings';
+import ScreenWrapper from '../../../components/ScreenWrapper';
 import {MMKV} from 'react-native-mmkv';
 import {useDispatch, useSelector} from 'react-redux';
-import {AppDispatch, RootState} from '../../redux/store';
+import {AppDispatch, RootState} from '../../../redux/store';
 import {
   apiRequest,
   endLoader,
   fetchApiData,
   startLoader,
-} from '../../redux/actions';
-import {loader} from '../../components/Loader';
-import {formatUSPhoneNumber, toaster} from '../../Utils';
-import {API_ACTIONS} from '../../Constant/apiActionTypes';
+} from '../../../redux/actions';
+import {loader} from '../../../components/Loader';
+import {formatUSPhoneNumber, toaster} from '../../../Utils';
+import {API_ACTIONS} from '../../../Constant/apiActionTypes';
 import auth, {FirebaseAuthTypes} from '@react-native-firebase/auth';
-import {english} from '../../localization/english';
-import {Color} from '../../Constant/Color';
+import {english} from '../../../localization/english';
+import {Color} from '../../../Constant/Color';
 
 type OtpProps = {
   navigation: StackNavigationProp<any, typeof NavigationStrings.OTP>;

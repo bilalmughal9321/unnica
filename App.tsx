@@ -53,7 +53,7 @@ import NavigationStrings from './src/Constant/NavigationStrings';
 import ScreenWrapper from './src/components/ScreenWrapper';
 import SignUpSuccess from './src/screen/SignUp/signSuccess';
 import SocialSignupScreen from './src/screen/SignUp/SocialSignup';
-import SigninFormScreen from './src/screen/SignIn/SigInFormScreen';
+import SigninFormScreen from './src/screen/Authentication/SignIn/SigInFormScreen';
 
 type SectionProps = PropsWithChildren<{
   title: string;

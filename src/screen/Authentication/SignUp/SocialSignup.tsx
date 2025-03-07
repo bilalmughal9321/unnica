@@ -13,19 +13,19 @@ import {
   ScrollView,
 } from 'react-native';
 import {useSelector, useDispatch} from 'react-redux';
-import {AppDispatch, RootState} from '../../redux/store';
+import {AppDispatch, RootState} from '../../../redux/store';
 import {RouteProp, useNavigation} from '@react-navigation/native';
 import {StackNavigationProp, StackScreenProps} from '@react-navigation/stack';
-import NavigationStrings from '../../Constant/NavigationStrings';
-import ScreenWrapper from '../../components/ScreenWrapper';
-import {Color} from '../../Constant/Color';
-import FooterText from '../../components/Footer';
-import {english} from '../../localization/english';
+import NavigationStrings from '../../../Constant/NavigationStrings';
+import ScreenWrapper from '../../../components/ScreenWrapper';
+import {Color} from '../../../Constant/Color';
+import FooterText from '../../../components/Footer';
+import {english} from '../../../localization/english';
 import Toast from 'react-native-simple-toast';
-import {clearData, toaster} from '../../Utils';
+import {clearData, toaster} from '../../../Utils';
 import {MMKV} from 'react-native-mmkv';
-import {loader} from '../../components/Loader';
-import {fetchApiData} from '../../redux/actions';
+import {loader} from '../../../components/Loader';
+import {fetchApiData} from '../../../redux/actions';
 import {
   GoogleSignin,
   GoogleSigninButton,

@@ -13,47 +13,49 @@ import {
   ScrollView,
 } from 'react-native';
 import {useSelector, useDispatch} from 'react-redux';
-import {AppDispatch, RootState} from '../../redux/store';
+import {AppDispatch, RootState} from '../../../redux/store';
 import {RouteProp, useNavigation} from '@react-navigation/native';
 import {StackNavigationProp, StackScreenProps} from '@react-navigation/stack';
-import NavigationStrings from '../../Constant/NavigationStrings';
-import ScreenWrapper from '../../components/ScreenWrapper';
-import {Color} from '../../Constant/Color';
-import FooterText from '../../components/Footer';
-import {english} from '../../localization/english';
+import NavigationStrings from '../../../Constant/NavigationStrings';
+import ScreenWrapper from '../../../components/ScreenWrapper';
+import {Color} from '../../../Constant/Color';
+import FooterText from '../../../components/Footer';
+import {english} from '../../../localization/english';
 import Toast from 'react-native-simple-toast';
-import {clearData, toaster} from '../../Utils';
+import {clearData, toaster} from '../../../Utils';
 import {MMKV} from 'react-native-mmkv';
-import {loader} from '../../components/Loader';
+import {loader} from '../../../components/Loader';
 import {
   apiReset,
   endLoader,
   fetchApiData,
   startLoader,
-} from '../../redux/actions';
-import {API_ACTIONS} from '../../Constant/apiActionTypes';
+} from '../../../redux/actions';
+import {API_ACTIONS} from '../../../Constant/apiActionTypes';
 
 type SignUpProps = {
   navigation: StackNavigationProp<any, typeof NavigationStrings.SIGNUP>;
 };
 
 const SignupFormScreen: React.FC<SignUpProps> = ({navigation}) => {
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
+  // ░▒▓████████████████████████ STATE █████████████████████████▓▒░
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [firstName, setFirstName] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
+  // ░▒▓████████████████████████ STORAGE █████████████████████████▓▒░
+
   const storage = new MMKV();
+
+  // ░▒▓████████████████████████ REDUX █████████████████████████▓▒░
+
   const dispatch = useDispatch<AppDispatch>();
-  const val = useSelector((state: RootState) => state.Unnica);
-
-  const phoneNumber = '+34622222222'; // Example phone number
-  const encodedPhone = encodeURIComponent(phoneNumber); // Encode the phone number
-
-  const isLoadingOTP = useSelector((state: RootState) => state);
-
   const {load, data, err} = useSelector((state: RootState) => state.Unnica);
+
+  // ░▒▓████████████████████████ EFFECTS █████████████████████████▓▒░
 
   useEffect(() => {
     if (clearData) {
@@ -108,21 +110,7 @@ const SignupFormScreen: React.FC<SignUpProps> = ({navigation}) => {
     }
   }, []);
 
-  // useEffect(() => {
-  //   console.log('value: ', load);
-  // }, [load]);
-
-  // useEffect(() => {
-  //   console.log('err: ', err);
-  // }, [err]);
-
-  const handleNext = () => {
-    if (firstName.trim() && lastName.trim()) {
-      navigation.navigate('GenerateUsername', {firstName, lastName});
-    } else {
-      Alert.alert('Please enter your first and last name');
-    }
-  };
+  // ░▒▓████████████████████████ FORM SUBMISSION █████████████████████████▓▒░
 
   const submit = () => {
     if (firstName == '') {
@@ -163,29 +151,10 @@ const SignupFormScreen: React.FC<SignUpProps> = ({navigation}) => {
           },
         ),
       );
-
-      // console.log('Step 1 completed.');
-
-      // toaster('STEP 1 COMPLETED');
-
-      // navigation.navigate(NavigationStrings.GENERATE_USERNAME, {
-      //   fn: firstName,
-      //   ln: lastName,
-      //   email: email,
-      //   password: password,
-      // });
-
-      // dispatch(
-      //   fetchApiData(
-      //     'GET_OTP',
-      //     `http://api.ci.unnica-dev.co/admin/otp?phone=${encodedPhone}`,
-      //     'GET',
-      //   ),
-      // );
     }
   };
 
-  // *************** Check Signup response *******************
+  // ░▒▓████████████████████████ API RESPONSE █████████████████████████▓▒░
 
   useEffect(() => {
     if (data.SIGNUP) {
@@ -203,10 +172,12 @@ const SignupFormScreen: React.FC<SignUpProps> = ({navigation}) => {
   useEffect(() => {
     if (err.SIGNUP) {
       console.log(err.SIGNUP);
-      toaster(err.SIGNUP.msg);
+      // toaster(err.SIGNUP.msg);
       dispatch(apiReset(API_ACTIONS.SIGNUP));
     }
   }, [err.SIGNUP]);
+
+  // ░▒▓████████████████████████ UI COMPONENT █████████████████████████▓▒░
 
   return (
     <ScreenWrapper isBackground={false}>
@@ -288,6 +259,8 @@ const SignupFormScreen: React.FC<SignUpProps> = ({navigation}) => {
     </ScreenWrapper>
   );
 };
+
+// ░▒▓████████████████████████ STYLES █████████████████████████▓▒░
 
 const styles = StyleSheet.create({
   container: {

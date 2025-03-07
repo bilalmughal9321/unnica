@@ -13,27 +13,27 @@ import {
   ScrollView,
 } from 'react-native';
 import {useSelector, useDispatch} from 'react-redux';
-import {AppDispatch, RootState} from '../../redux/store';
+import {AppDispatch, RootState} from '../../../redux/store';
 import {RouteProp, useNavigation} from '@react-navigation/native';
 import {StackNavigationProp} from '@react-navigation/stack';
-import NavigationStrings from '../../Constant/NavigationStrings';
-import ScreenWrapper from '../../components/ScreenWrapper';
-import {Color} from '../../Constant/Color';
-import FooterText from '../../components/Footer';
-import {english} from '../../localization/english';
+import NavigationStrings from '../../../Constant/NavigationStrings';
+import ScreenWrapper from '../../../components/ScreenWrapper';
+import {Color} from '../../../Constant/Color';
+import FooterText from '../../../components/Footer';
+import {english} from '../../../localization/english';
 import Toast from 'react-native-simple-toast';
-import {clearData, toaster} from '../../Utils';
+import {clearData, toaster} from '../../../Utils';
 import {MMKV} from 'react-native-mmkv';
-import {loader} from '../../components/Loader';
+import {loader} from '../../../components/Loader';
 import auth from '@react-native-firebase/auth';
 import {
   apiReset,
   endLoader,
   fetchApiData,
   startLoader,
-} from '../../redux/actions';
-import {API_ACTIONS} from '../../Constant/apiActionTypes';
-import {api_method, api_url} from '../../Constant/url';
+} from '../../../redux/actions';
+import {API_ACTIONS} from '../../../Constant/apiActionTypes';
+import {api_method, api_url} from '../../../Constant/url';
 
 type SignInProps = {
   navigation: StackNavigationProp<any, typeof NavigationStrings.SIGNIN>;
@@ -109,7 +109,7 @@ const SigninFormScreen: React.FC<SignInProps> = ({navigation}) => {
   useEffect(() => {
     if (err.SIGNIN) {
       console.log(err.SIGNIN);
-      toaster(err.SIGNIN.msg);
+      // toaster(err.SIGNIN.msg);
       dispatch(apiReset(API_ACTIONS.SIGNIN));
     }
   }, [err.SIGNIN]);
