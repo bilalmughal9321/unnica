@@ -191,7 +191,7 @@ const SignupFormScreen: React.FC<SignUpProps> = ({navigation}) => {
           <View style={styles.innerContainer}>
             <Image
               style={styles.titleImage}
-              source={require('../../asset/unnica_logo.png')}
+              source={require('../../../asset/unnica_logo.png')}
             />
 
             <View style={styles.box}>

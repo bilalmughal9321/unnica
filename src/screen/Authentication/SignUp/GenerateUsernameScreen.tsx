@@ -73,7 +73,7 @@ const GenerateUsernameScreen: React.FC<GeneratedUsernameProps> = ({
       <View style={styles.logoImageView}>
         <Image
           style={styles.logoImage}
-          source={require('../../asset/unnica_logo.png')}
+          source={require('../../../asset/unnica_logo.png')}
         />
         <Text style={styles.welcomeText}>{english.genUsernameWelcome}</Text>
       </View>
@@ -290,7 +290,7 @@ const GenerateUsernameScreen: React.FC<GeneratedUsernameProps> = ({
                         style={styles.penImageTouchableOpacity}>
                         <Image
                           style={styles.penImage}
-                          source={require('../../asset/pen.png')}
+                          source={require('../../../asset/pen.png')}
                         />
                       </TouchableOpacity>
                     </View>
@@ -331,7 +331,7 @@ const GenerateUsernameScreen: React.FC<GeneratedUsernameProps> = ({
                           marginLeft: 10,
                           tintColor: Color.themeOrangeColor,
                         }}
-                        source={require('../../asset/arrowDown.png')}
+                        source={require('../../../asset/arrowDown.png')}
                       />
                     </TouchableOpacity>
                   </View>

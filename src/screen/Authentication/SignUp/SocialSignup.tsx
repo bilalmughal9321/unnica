@@ -208,7 +208,7 @@ const SocialSignupScreen: React.FC<SocialSignupProps> = ({navigation}) => {
       <View style={styles.google_container}>
         <TouchableOpacity style={styles.google_button} onPress={googleLogin}>
           <Image
-            source={require('../../asset/google.png')}
+            source={require('../../../asset/google.png')}
             style={styles.google_icon}
           />
           <Text style={styles.google_text}>Continue with Google</Text>
@@ -224,7 +224,7 @@ const SocialSignupScreen: React.FC<SocialSignupProps> = ({navigation}) => {
           style={styles.google_button}
           onPress={onAppleButtonPress}>
           <Image
-            source={require('../../asset/apple.png')}
+            source={require('../../../asset/apple.png')}
             style={styles.google_icon}
           />
           <Text style={styles.google_text}>Continue with Apple</Text>
@@ -245,7 +245,7 @@ const SocialSignupScreen: React.FC<SocialSignupProps> = ({navigation}) => {
           <View style={styles.innerContainer}>
             <Image
               style={styles.titleImage}
-              source={require('../../asset/unnica_logo.png')}
+              source={require('../../../asset/unnica_logo.png')}
             />
 
             <View style={styles.box}>

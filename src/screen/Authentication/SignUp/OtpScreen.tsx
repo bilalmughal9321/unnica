@@ -346,12 +346,7 @@ import ScreenWrapper from '../../../components/ScreenWrapper';
 import {MMKV} from 'react-native-mmkv';
 import {useDispatch, useSelector} from 'react-redux';
 import {AppDispatch, RootState} from '../../../redux/store';
-import {
-  apiRequest,
-  endLoader,
-  fetchApiData,
-  startLoader,
-} from '../../../redux/actions';
+import {endLoader, fetchApiData, startLoader} from '../../../redux/actions';
 import {loader} from '../../../components/Loader';
 import {formatUSPhoneNumber, toaster} from '../../../Utils';
 import {API_ACTIONS} from '../../../Constant/apiActionTypes';
