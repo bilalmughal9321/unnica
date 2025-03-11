@@ -66,48 +66,48 @@ const SignupFormScreen: React.FC<SignUpProps> = ({navigation}) => {
 
     let step = storage.getNumber('Step');
 
-    if (step == 1) {
-      let data = storage.getString('USER_DATA');
-      if (data) {
-        console.log('saved value: ', JSON.parse(data));
-        let value = JSON.parse(data);
+    // if (step == 1) {
+    //   let data = storage.getString('USER_DATA');
+    //   if (data) {
+    //     console.log('saved value: ', JSON.parse(data));
+    //     let value = JSON.parse(data);
 
-        toaster('sign up process step 1 is already completed.');
+    //     toaster('sign up process step 1 is already completed.');
 
-        const timer = setTimeout(() => {
-          navigation.navigate(NavigationStrings.GENERATE_USERNAME, {
-            fn: value.firstName,
-            ln: value.lastName,
-            email: value.email,
-            password: value.password,
-          });
-        }, 3000);
-        // Clear timeout on component unmount
-        return () => clearTimeout(timer);
-      }
-    } else if (step == 2) {
-      let data = storage.getString('USER_DATA');
-      if (data) {
-        console.log('saved value: ', JSON.parse(data));
-        let value = JSON.parse(data);
+    //     const timer = setTimeout(() => {
+    //       navigation.navigate(NavigationStrings.GENERATE_USERNAME, {
+    //         fn: value.firstName,
+    //         ln: value.lastName,
+    //         email: value.email,
+    //         password: value.password,
+    //       });
+    //     }, 3000);
+    //     // Clear timeout on component unmount
+    //     return () => clearTimeout(timer);
+    //   }
+    // } else if (step == 2) {
+    //   let data = storage.getString('USER_DATA');
+    //   if (data) {
+    //     console.log('saved value: ', JSON.parse(data));
+    //     let value = JSON.parse(data);
 
-        toaster('sign up process step 1 and 2 is already completed.');
+    //     toaster('sign up process step 1 and 2 is already completed.');
 
-        const timer = setTimeout(() => {
-          navigation.navigate(NavigationStrings.OTP, {
-            fn: value.firstName,
-            ln: value.lastName,
-            email: value.email,
-            password: value.password,
-            username: value.username,
-            dob: value.dob,
-            number: value.number,
-          });
-        }, 3000);
-        // Clear timeout on component unmount
-        return () => clearTimeout(timer);
-      }
-    }
+    //     const timer = setTimeout(() => {
+    //       navigation.navigate(NavigationStrings.OTP, {
+    //         fn: value.firstName,
+    //         ln: value.lastName,
+    //         email: value.email,
+    //         password: value.password,
+    //         username: value.username,
+    //         dob: value.dob,
+    //         number: value.number,
+    //       });
+    //     }, 3000);
+    //     // Clear timeout on component unmount
+    //     return () => clearTimeout(timer);
+    //   }
+    // }
   }, []);
 
   // ░▒▓████████████████████████ FORM SUBMISSION █████████████████████████▓▒░

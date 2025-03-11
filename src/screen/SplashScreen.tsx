@@ -45,9 +45,10 @@ const SplashScreen: React.FC<SplashScreenProps> = ({navigation}) => {
         index: 0, // Set index to 1 (0-based index), keeping Splash at index 0 and Screen1 at index 1
         routes: [{name: NavigationStrings.SOCIALSIGNUP}],
       });
-    }, 2000);
+    }, 1000);
     // Clear timeout on component unmount
     return () => clearTimeout(timer);
+
     // } else {
     //   // Alert.alert('user is not logged in');
     // }

@@ -24,7 +24,7 @@ import {isValidUSPhoneNumber, toaster} from '../../../Utils';
 import {MMKV} from 'react-native-mmkv';
 import {useSelector, useDispatch} from 'react-redux';
 import {AppDispatch, RootState} from '../../../redux/store';
-import {apiReset, fetchApiData} from '../../../redux/actions';
+import {apiReset, fetchApiData, startLoader} from '../../../redux/actions';
 import {API_ACTIONS} from '../../../Constant/apiActionTypes';
 
 type GeneratedUsernameProps = {
@@ -50,6 +50,7 @@ const GenerateUsernameScreen: React.FC<GeneratedUsernameProps> = ({
   const [date, setDate] = useState(new Date());
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [image, setImage] = useState(false);
   const storage = new MMKV();
 
   const {fn, ln, email, password} = route.params || {};
@@ -58,15 +59,11 @@ const GenerateUsernameScreen: React.FC<GeneratedUsernameProps> = ({
   const {load, data, err} = useSelector((state: RootState) => state.Unnica);
 
   useEffect(() => {
-    if (fn) setFirstName(fn);
-    if (ln) setLastName(ln);
-  }, [fn, ln]); // Depend on fn and ln
-
-  // useEffect(() => {
-  //   if (firstName && lastName) {
-  //     generateRandomUsername();
-  //   }
-  // }, [firstName, lastName]);
+    setImage(true);
+    setTimeout(() => {
+      setImage(false);
+    }, 3000);
+  }, []);
 
   const ImageLogo = () => {
     return (
@@ -211,170 +208,180 @@ const GenerateUsernameScreen: React.FC<GeneratedUsernameProps> = ({
   return (
     <ScreenWrapper isBackground={true}>
       {/* {isLoggedIn ? <UserNameView /> : <ImageLogo />} */}
+      {image ? (
+        <ImageLogo />
+      ) : (
+        <ScrollView style={styles.container}>
+          <View style={styles.container2}>
+            <Text
+              style={{
+                color: 'white',
+                fontWeight: '500',
+                fontSize: 25,
+                marginTop: 10,
+              }}>
+              <Text style={{fontSize: 40}}>Wait!</Text> Almost Done...
+            </Text>
 
-      <ScrollView style={styles.container}>
-        <View style={styles.container2}>
-          <Text
-            style={{
-              color: 'white',
-              fontWeight: '500',
-              fontSize: 25,
-              marginTop: 10,
-            }}>
-            <Text style={{fontSize: 40}}>Wait!</Text> Almost Done...
-          </Text>
+            <Text
+              style={{
+                color: 'white',
+                fontWeight: '500',
+                fontSize: 25,
+                marginBottom: 20,
+              }}>
+              Please verify and complete
+            </Text>
 
-          <Text
-            style={{
-              color: 'white',
-              fontWeight: '500',
-              fontSize: 25,
-              marginBottom: 20,
-            }}>
-            Please verify and complete
-          </Text>
+            <View style={styles.box}>
+              <View style={{padding: 5}}>
+                {/* VStack */}
+                <View style={styles.VStackView}>
+                  <View style={styles.HStackView}>
+                    <View style={styles.parentTexfieldView}>
+                      <Text style={{alignSelf: 'center'}}>
+                        {english.firstName}
+                      </Text>
+                      <TextInput
+                        style={styles.textField}
+                        placeholder={english.firstName}
+                        value={firstName}
+                        onChangeText={handleFname}
+                        editable={false}
+                      />
+                    </View>
 
-          <View style={styles.box}>
-            <View style={{padding: 5}}>
-              {/* VStack */}
-              <View style={styles.VStackView}>
-                <View style={styles.HStackView}>
-                  <View style={styles.parentTexfieldView}>
-                    <Text style={{alignSelf: 'center'}}>
-                      {english.firstName}
-                    </Text>
-                    <TextInput
-                      style={styles.textField}
-                      placeholder={english.firstName}
-                      value={firstName}
-                      onChangeText={handleFname}
-                      editable={false}
-                    />
+                    <View style={styles.parentTexfieldView}>
+                      <Text style={{alignSelf: 'center'}}>
+                        {english.lstName}
+                      </Text>
+                      <TextInput
+                        style={styles.textField}
+                        placeholder={english.lstName}
+                        value={lastName}
+                        onChangeText={handleLname}
+                        editable={false}
+                      />
+                    </View>
                   </View>
 
-                  <View style={styles.parentTexfieldView}>
-                    <Text style={{alignSelf: 'center'}}>{english.lstName}</Text>
-                    <TextInput
-                      style={styles.textField}
-                      placeholder={english.lstName}
-                      value={lastName}
-                      onChangeText={handleLname}
-                      editable={false}
-                    />
+                  <View style={styles.HStackView}>
+                    <View style={styles.parentTexfieldView}>
+                      <Text style={{alignSelf: 'center'}}>
+                        {english.username}
+                      </Text>
+                      <View style={[styles.textField, {flex: 1}]}>
+                        {isLoading ? (
+                          <ActivityIndicator
+                            size="small"
+                            color="black"
+                            style={{marginRight: 10, flex: 1}}
+                          />
+                        ) : (
+                          <TextInput
+                            style={{flex: 1}}
+                            placeholder={english.username}
+                            onChangeText={handleUsername}
+                            value={username}
+                            editable={true}
+                          />
+                        )}
+                        <TouchableOpacity
+                          onPress={() => generateRandomUsername()}
+                          style={styles.penImageTouchableOpacity}>
+                          <Image
+                            style={styles.penImage}
+                            source={require('../../../asset/pen.png')}
+                          />
+                        </TouchableOpacity>
+                      </View>
+                    </View>
                   </View>
-                </View>
 
-                <View style={styles.HStackView}>
-                  <View style={styles.parentTexfieldView}>
-                    <Text style={{alignSelf: 'center'}}>
-                      {english.username}
-                    </Text>
-                    <View style={[styles.textField, {flex: 1}]}>
-                      {isLoading ? (
-                        <ActivityIndicator
-                          size="small"
-                          color="black"
-                          style={{marginRight: 10, flex: 1}}
-                        />
-                      ) : (
-                        <TextInput
-                          style={{flex: 1}}
-                          placeholder={english.username}
-                          onChangeText={handleUsername}
-                          value={username}
-                          editable={true}
-                        />
-                      )}
+                  <View style={styles.HStackView}>
+                    <View style={styles.parentTexfieldView}>
+                      <Text style={{alignSelf: 'center'}}>
+                        {english.dobText}
+                      </Text>
                       <TouchableOpacity
-                        onPress={() => generateRandomUsername()}
-                        style={styles.penImageTouchableOpacity}>
-                        <Image
-                          style={styles.penImage}
-                          source={require('../../../asset/pen.png')}
-                        />
+                        onPress={() => setOpen(true)}
+                        style={styles.textField}>
+                        <Text
+                          style={{textAlign: 'center', alignSelf: 'center'}}>
+                          {dob}
+                        </Text>
                       </TouchableOpacity>
                     </View>
                   </View>
-                </View>
 
-                <View style={styles.HStackView}>
-                  <View style={styles.parentTexfieldView}>
-                    <Text style={{alignSelf: 'center'}}>{english.dobText}</Text>
-                    <TouchableOpacity
-                      onPress={() => setOpen(true)}
-                      style={styles.textField}>
-                      <Text style={{textAlign: 'center', alignSelf: 'center'}}>
-                        {dob}
+                  <View style={styles.HStackView}>
+                    <View style={[styles.parentTexfieldView, {flex: 1}]}>
+                      <Text style={{alignSelf: 'center', color: 'transparent'}}>
+                        V
                       </Text>
-                    </TouchableOpacity>
-                  </View>
-                </View>
+                      <TouchableOpacity style={styles.textField}>
+                        <Text
+                          style={{
+                            flex: 1,
+                            alignSelf: 'center',
+                          }}>
+                          +1
+                        </Text>
+                        <Image
+                          style={{
+                            width: 20,
+                            height: 25,
+                            flex: 1,
+                            marginLeft: 10,
+                            tintColor: Color.themeOrangeColor,
+                          }}
+                          source={require('../../../asset/arrowDown.png')}
+                        />
+                      </TouchableOpacity>
+                    </View>
 
-                <View style={styles.HStackView}>
-                  <View style={[styles.parentTexfieldView, {flex: 1}]}>
-                    <Text style={{alignSelf: 'center', color: 'transparent'}}>
-                      V
-                    </Text>
-                    <TouchableOpacity style={styles.textField}>
-                      <Text
-                        style={{
-                          flex: 1,
-                          alignSelf: 'center',
-                        }}>
-                        +1
+                    <View style={[styles.parentTexfieldView, {flex: 2}]}>
+                      <Text style={{alignSelf: 'center'}}>
+                        Verify Mobile Number
                       </Text>
-                      <Image
-                        style={{
-                          width: 20,
-                          height: 25,
-                          flex: 1,
-                          marginLeft: 10,
-                          tintColor: Color.themeOrangeColor,
-                        }}
-                        source={require('../../../asset/arrowDown.png')}
+                      <TextInput
+                        style={styles.textField}
+                        placeholder={english.number}
+                        value={number}
+                        onChangeText={handleNumber}
                       />
-                    </TouchableOpacity>
-                  </View>
-
-                  <View style={[styles.parentTexfieldView, {flex: 2}]}>
-                    <Text style={{alignSelf: 'center'}}>
-                      Verify Mobile Number
-                    </Text>
-                    <TextInput
-                      style={styles.textField}
-                      placeholder={english.number}
-                      value={number}
-                      onChangeText={handleNumber}
-                    />
+                    </View>
                   </View>
                 </View>
               </View>
             </View>
+
+            <TouchableOpacity onPress={onSubmit} style={styles.confirmPwd}>
+              <Text style={styles.confirmPwdText}>
+                {english.signUpSubmitBtn}
+              </Text>
+            </TouchableOpacity>
+
+            <DatePicker
+              modal
+              open={open}
+              date={date}
+              mode="date"
+              maximumDate={new Date()}
+              onConfirm={date => {
+                setPicker(true); // check if the picker is open for the first time
+                setOpen(false);
+                setDate(date);
+                const formattedDate = date.toLocaleDateString('en-GB'); // "DD/MM/YYYY" format
+                setDob(formattedDate);
+              }}
+              onCancel={() => {
+                setOpen(false);
+              }}
+            />
           </View>
-
-          <TouchableOpacity onPress={onSubmit} style={styles.confirmPwd}>
-            <Text style={styles.confirmPwdText}>{english.signUpSubmitBtn}</Text>
-          </TouchableOpacity>
-
-          <DatePicker
-            modal
-            open={open}
-            date={date}
-            mode="date"
-            maximumDate={new Date()}
-            onConfirm={date => {
-              setPicker(true); // check if the picker is open for the first time
-              setOpen(false);
-              setDate(date);
-              const formattedDate = date.toLocaleDateString('en-GB'); // "DD/MM/YYYY" format
-              setDob(formattedDate);
-            }}
-            onCancel={() => {
-              setOpen(false);
-            }}
-          />
-        </View>
-      </ScrollView>
+        </ScrollView>
+      )}
     </ScreenWrapper>
   );
 };

@@ -25,7 +25,7 @@ import Toast from 'react-native-simple-toast';
 import {clearData, toaster} from '../../../Utils';
 import {MMKV} from 'react-native-mmkv';
 import {loader} from '../../../components/Loader';
-import {fetchApiData} from '../../../redux/actions';
+import {endLoader, fetchApiData, startLoader} from '../../../redux/actions';
 import {
   GoogleSignin,
   GoogleSigninButton,
@@ -87,25 +87,44 @@ const SocialSignupScreen: React.FC<SocialSignupProps> = ({navigation}) => {
     let token = userInfo.data?.idToken;
     let isSocial = true;
 
+    const userData = {
+      fname,
+      lname,
+      email,
+      token,
+    };
+
+    storage.set('USER_DATA', JSON.stringify(userData));
+
+    dispatch(startLoader());
+    setTimeout(() => {
+      dispatch(endLoader());
+
+      navigation.navigate(NavigationStrings.GENERATE_USERNAME, {
+        fn: fname,
+        ln: lname,
+        email: email,
+        password: token,
+      });
+    }, 2000);
+
     // dispatchApi(fname, lname, email, username, token, isSocial);
 
-    setTimeout(() => {}, 5000);
-
-    dispatch(
-      fetchApiData(
-        'SIGNUP',
-        `http://api.ci.unnica-dev.co/user/signup?p=1`,
-        'POST',
-        {
-          firstName: fname,
-          lastName: lname,
-          email: email,
-          username: username,
-          idToken: token,
-          isSocial: isSocial,
-        },
-      ),
-    );
+    // dispatch(
+    //   fetchApiData(
+    //     'SIGNUP',
+    //     `http://api.ci.unnica-dev.co/user/signup?p=1`,
+    //     'POST',
+    //     {
+    //       firstName: fname,
+    //       lastName: lname,
+    //       email: email,
+    //       username: username,
+    //       idToken: token,
+    //       isSocial: isSocial,
+    //     },
+    //   ),
+    // );
 
     return userInfo;
   };
