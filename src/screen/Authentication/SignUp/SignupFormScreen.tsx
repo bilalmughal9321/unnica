@@ -32,6 +32,8 @@ import {
   startLoader,
 } from '../../../redux/actions';
 import {API_ACTIONS} from '../../../Constant/apiActionTypes';
+import {api_method, api_url} from '../../../Constant/url';
+import {errorString} from '../../../Constant/ErrorString';
 
 type SignUpProps = {
   navigation: StackNavigationProp<any, typeof NavigationStrings.SIGNUP>;
@@ -62,49 +64,43 @@ const SignupFormScreen: React.FC<SignUpProps> = ({navigation}) => {
       storage.clearAll();
     }
 
-    dispatch(endLoader());
+    const step = storage.getNumber('Step');
+    const userData = storage.getString('USER_DATA');
 
-    let step = storage.getNumber('Step');
+    if (userData) {
+      const parsedData = JSON.parse(userData);
 
-    if (step == 1) {
-      let data = storage.getString('USER_DATA');
-      if (data) {
-        console.log('saved value: ', JSON.parse(data));
-        let value = JSON.parse(data);
+      let navigateTo = null;
 
-        toaster('sign up process step 1 is already completed.');
-
-        const timer = setTimeout(() => {
-          navigation.navigate(NavigationStrings.GENERATE_USERNAME, {
-            fn: value.firstName,
-            ln: value.lastName,
-            email: value.email,
-            password: value.password,
-          });
-        }, 3000);
-        // Clear timeout on component unmount
-        return () => clearTimeout(timer);
+      if (step === 1) {
+        navigateTo = {
+          screen: NavigationStrings.GENERATE_USERNAME,
+          params: {
+            fn: parsedData.firstName,
+            ln: parsedData.lastName,
+            email: parsedData.email,
+            password: parsedData.password,
+          },
+        };
+      } else if (step === 2) {
+        navigateTo = {
+          screen: NavigationStrings.OTP,
+          params: {
+            fn: parsedData.firstName,
+            ln: parsedData.lastName,
+            email: parsedData.email,
+            password: parsedData.password,
+            username: parsedData.username,
+            dob: parsedData.dob,
+            number: parsedData.number,
+          },
+        };
       }
-    } else if (step == 2) {
-      let data = storage.getString('USER_DATA');
-      if (data) {
-        console.log('saved value: ', JSON.parse(data));
-        let value = JSON.parse(data);
 
-        toaster('sign up process step 1 and 2 is already completed.');
-
+      if (navigateTo) {
         const timer = setTimeout(() => {
-          navigation.navigate(NavigationStrings.OTP, {
-            fn: value.firstName,
-            ln: value.lastName,
-            email: value.email,
-            password: value.password,
-            username: value.username,
-            dob: value.dob,
-            number: value.number,
-          });
+          navigation.navigate(navigateTo.screen, navigateTo.params);
         }, 3000);
-        // Clear timeout on component unmount
         return () => clearTimeout(timer);
       }
     }
@@ -113,53 +109,36 @@ const SignupFormScreen: React.FC<SignUpProps> = ({navigation}) => {
   // ░▒▓████████████████████████ FORM SUBMISSION █████████████████████████▓▒░
 
   const submit = () => {
-    if (firstName == '') {
-      toaster('First name is missing');
-    } else if (lastName == '') {
-      toaster('First name is missing');
-    } else if (password == '') {
-      toaster('Password is missing');
-    } else if (password.length <= 5) {
-      toaster('Password must be 6 character long');
-    } else if (confirmPassword == '') {
-      toaster('Confirm password is missing');
-    } else if (password != confirmPassword) {
-      toaster('Password is not match with comfirm password');
-    } else {
-      const userData = {
+    if (!firstName) return toaster(errorString.firstnameMissing);
+    if (!lastName) return toaster(errorString.lastnameMissing);
+    if (!password) return toaster(errorString.passwordMissing);
+    if (password.length < 6) return toaster(errorString.passwordLengthExceed);
+    if (!confirmPassword) return toaster(errorString.confirmPasswordMissing);
+    if (password !== confirmPassword)
+      return toaster(errorString.passwordNotMatch);
+
+    const userData = {firstName, lastName, email, password};
+
+    // Store user data and step
+    storage.set('USER_DATA', JSON.stringify(userData));
+    storage.set('Step', 1);
+
+    // API call for signup
+    dispatch(
+      fetchApiData(API_ACTIONS.SIGNUP, api_url.signup1, api_method.post, {
         firstName,
         lastName,
         email,
-        password,
-      };
-
-      storage.set('USER_DATA', JSON.stringify(userData)); // Store object as JSON
-      storage.set('Step', 1); // Store step completion
-
-      console.log('User data saved:', userData);
-
-      dispatch(
-        fetchApiData(
-          'SIGNUP',
-          `http://api.ci.unnica-dev.co/user/signup?p=1`,
-          'POST',
-          {
-            firstName: firstName,
-            lastName: lastName,
-            email: email,
-            isSocial: false,
-          },
-        ),
-      );
-    }
+        isSocial: false,
+      }),
+    );
   };
 
   // ░▒▓████████████████████████ API RESPONSE █████████████████████████▓▒░
 
   useEffect(() => {
     if (data.SIGNUP) {
-      toaster('signup part 1 is completed');
-      dispatch(apiReset('SIGNUP'));
+      dispatch(apiReset(API_ACTIONS.SIGNUP));
       navigation.navigate(NavigationStrings.GENERATE_USERNAME, {
         fn: firstName,
         ln: lastName,

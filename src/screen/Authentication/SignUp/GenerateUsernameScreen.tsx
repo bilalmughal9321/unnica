@@ -26,6 +26,8 @@ import {useSelector, useDispatch} from 'react-redux';
 import {AppDispatch, RootState} from '../../../redux/store';
 import {apiReset, fetchApiData} from '../../../redux/actions';
 import {API_ACTIONS} from '../../../Constant/apiActionTypes';
+import {api_method, api_url} from '../../../Constant/url';
+import {errorString} from '../../../Constant/ErrorString';
 
 type GeneratedUsernameProps = {
   navigation: StackNavigationProp<
@@ -39,136 +41,36 @@ const GenerateUsernameScreen: React.FC<GeneratedUsernameProps> = ({
   navigation,
   route,
 }) => {
-  const [isLoggedIn, setLoggedIn] = useState(false);
-  const [firstName, setFirstName] = useState();
+  // ░▒▓████████████████████████ STATE █████████████████████████▓▒░
+
+  const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [username, setUsername] = useState('');
   const [number, setNumber] = useState('');
   const [dob, setDob] = useState('Date of birth');
   const [code, setCode] = useState('+1');
-  const [Picker, setPicker] = useState(false);
   const [date, setDate] = useState(new Date());
+  const [Picker, setPicker] = useState(false);
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [getLogo, setLogo] = useState(false);
+
+  // ░▒▓████████████████████████ STORAGE █████████████████████████▓▒░
+
   const storage = new MMKV();
 
+  // ░▒▓████████████████████████ NAVIGATION & REDUX █████████████████████████▓▒░
   const {fn, ln, email, password} = route.params || {};
-
   const dispatch = useDispatch<AppDispatch>();
-  const {load, data, err} = useSelector((state: RootState) => state.Unnica);
+  const {data, err} = useSelector((state: RootState) => state.Unnica);
 
+  // ░▒▓████████████████████████ EFFECT HOOKS █████████████████████████▓▒░
   useEffect(() => {
-    if (fn) setFirstName(fn);
-    if (ln) setLastName(ln);
-  }, [fn, ln]); // Depend on fn and ln
-
-  // useEffect(() => {
-  //   if (firstName && lastName) {
-  //     generateRandomUsername();
-  //   }
-  // }, [firstName, lastName]);
-
-  const ImageLogo = () => {
-    return (
-      <View style={styles.logoImageView}>
-        <Image
-          style={styles.logoImage}
-          source={require('../../asset/unnica_logo.png')}
-        />
-        <Text style={styles.welcomeText}>{english.genUsernameWelcome}</Text>
-      </View>
-    );
-  };
-
-  const generateRandomUsername = useCallback(() => {
-    if (firstName && lastName) {
-      setIsLoading(true); // Show loader
-      const randomNum = Math.floor(Math.random() * 10000000) + 1;
-
-      setTimeout(() => {
-        setUsername(`${firstName}_${lastName}_${randomNum}`);
-        setIsLoading(false); // Hide loader after 1 sec
-      }, 1000);
-    }
-  }, [firstName, lastName]);
-
-  const handleFname = (props: any) => {
-    setFirstName(props);
-  };
-
-  const handleLname = useCallback((props: any) => {
-    setLastName(props);
+    setLogo(true);
+    setTimeout(() => {
+      setLogo(false);
+    }, 3000);
   }, []);
-
-  const handleUsername = useCallback((props: any) => {
-    setUsername(props);
-  }, []);
-
-  const handleCode = useCallback((props: any) => {
-    setCode(props.x);
-  }, []);
-
-  const handleDob = useCallback((props: any) => {
-    setDob(props.x);
-  }, []);
-
-  const handleNumber = useCallback((props: any) => {
-    setNumber(props);
-  }, []);
-
-  const getFormattedDate = (date: Date) => {
-    const day = date.getDate();
-    const month = date.toLocaleString('en-US', {month: 'short'}); // "Feb"
-    const year = date.getFullYear();
-
-    // Add suffix to day (st, nd, rd, th)
-    const getDaySuffix = (day: number) => {
-      if (day > 3 && day < 21) return 'th'; // 4-20 use "th"
-      const lastDigit = day % 10;
-      return lastDigit === 1
-        ? 'st'
-        : lastDigit === 2
-        ? 'nd'
-        : lastDigit === 3
-        ? 'rd'
-        : 'th';
-    };
-
-    return `${day}${getDaySuffix(day)} ${month}, ${year}`;
-  };
-
-  const onSubmit = () => {
-    if (username == '') {
-      toaster('username is missing');
-    } else if (!Picker) {
-      toaster('date of birth is missing');
-    } else if (number == '') {
-      toaster('number is missing');
-    } else {
-      const fullNumber = `${code}${number}`;
-
-      if (!isValidUSPhoneNumber(fullNumber)) {
-        toaster('Wrong Number');
-        return;
-      }
-
-      dispatch(
-        fetchApiData(
-          'SIGNUP',
-          `http://api.ci.unnica-dev.co/user/signup?p=2`,
-          'POST',
-          {
-            firstName: firstName,
-            lastName: lastName,
-            username: username,
-            dob: dob,
-            phone: fullNumber,
-            isSocial: false,
-          },
-        ),
-      );
-    }
-  };
 
   useEffect(() => {
     if (data.SIGNUP) {
@@ -208,173 +110,253 @@ const GenerateUsernameScreen: React.FC<GeneratedUsernameProps> = ({
     }
   }, [err.SIGNUP]);
 
+  // ░▒▓████████████████████████ HELPER FUNCTIONS █████████████████████████▓▒░
+
+  const generateRandomUsername = useCallback(() => {
+    if (firstName && lastName) {
+      setIsLoading(true); // Show loader
+      const randomNum = Math.floor(Math.random() * 10000000) + 1;
+
+      setTimeout(() => {
+        setUsername(`${firstName}_${lastName}_${randomNum}`);
+        setIsLoading(false); // Hide loader after 1 sec
+      }, 1000);
+    }
+  }, [firstName, lastName]);
+
+  const getFormattedDate = (date: Date) => {
+    const day = date.getDate();
+    const month = date.toLocaleString('en-US', {month: 'short'});
+    const year = date.getFullYear();
+
+    const getDaySuffix = (day: number) => {
+      if (day > 3 && day < 21) return 'th';
+      const lastDigit = day % 10;
+      return lastDigit === 1
+        ? 'st'
+        : lastDigit === 2
+        ? 'nd'
+        : lastDigit === 3
+        ? 'rd'
+        : 'th';
+    };
+
+    return `${day}${getDaySuffix(day)} ${month}, ${year}`;
+  };
+
+  // ░▒▓████████████████████████ FORM HANDLERS █████████████████████████▓▒░
+
+  const handleFname = (props: any) => setFirstName(props);
+  const handleLname = useCallback((props: any) => setLastName(props), []);
+  const handleUsername = useCallback((props: any) => setUsername(props), []);
+  const handleNumber = useCallback((props: any) => setNumber(props), []);
+
+  // ░▒▓████████████████████████ SUBMISSION HANDLER █████████████████████████▓▒░
+
+  const onSubmit = () => {
+    if (!username) return toaster(errorString.usernameMissing);
+    if (!Picker) return toaster(errorString.dateOfBirthMissing);
+    if (!number) return toaster(errorString.numberMissing);
+
+    const fullNumber = `${code}${number}`;
+
+    if (!isValidUSPhoneNumber(fullNumber)) {
+      return toaster(errorString.numberWrong);
+    }
+
+    const userData = {
+      firstName,
+      lastName,
+      username,
+      dob,
+      phone: fullNumber,
+      isSocial: false,
+    };
+
+    dispatch(
+      fetchApiData(
+        API_ACTIONS.SIGNUP,
+        api_url.signup2,
+        api_method.post,
+        userData,
+      ),
+    );
+  };
+
+  // ░▒▓████████████████████████ UI COMPONENT █████████████████████████▓▒░
+
+  const ImageLogo = () => {
+    return (
+      <View style={styles.logoImageView}>
+        <Image
+          style={styles.logoImage}
+          source={require('../../asset/unnica_logo.png')}
+        />
+        <Text style={styles.welcomeText}>{english.genUsernameWelcome}</Text>
+      </View>
+    );
+  };
+
   return (
     <ScreenWrapper isBackground={true}>
-      {/* {isLoggedIn ? <UserNameView /> : <ImageLogo />} */}
+      {getLogo ? (
+        <ImageLogo />
+      ) : (
+        <ScrollView style={styles.container}>
+          <View style={styles.container2}>
+            <Text style={[styles.titleHeading]}>
+              <Text style={{fontSize: 40}}>Wait!</Text> Almost Done...
+            </Text>
+            <Text style={styles.titleHeading2}>Please verify and complete</Text>
+            <View style={styles.box}>
+              <View style={{padding: 5}}>
+                {/* VStack */}
+                <View style={styles.VStackView}>
+                  <View style={styles.HStackView}>
+                    <View style={styles.parentTexfieldView}>
+                      <Text style={{alignSelf: 'center'}}>
+                        {english.firstName}
+                      </Text>
+                      <TextInput
+                        style={styles.textField}
+                        placeholder={english.firstName}
+                        value={firstName}
+                        onChangeText={handleFname}
+                        editable={false}
+                      />
+                    </View>
 
-      <ScrollView style={styles.container}>
-        <View style={styles.container2}>
-          <Text
-            style={{
-              color: 'white',
-              fontWeight: '500',
-              fontSize: 25,
-              marginTop: 10,
-            }}>
-            <Text style={{fontSize: 40}}>Wait!</Text> Almost Done...
-          </Text>
-
-          <Text
-            style={{
-              color: 'white',
-              fontWeight: '500',
-              fontSize: 25,
-              marginBottom: 20,
-            }}>
-            Please verify and complete
-          </Text>
-
-          <View style={styles.box}>
-            <View style={{padding: 5}}>
-              {/* VStack */}
-              <View style={styles.VStackView}>
-                <View style={styles.HStackView}>
-                  <View style={styles.parentTexfieldView}>
-                    <Text style={{alignSelf: 'center'}}>
-                      {english.firstName}
-                    </Text>
-                    <TextInput
-                      style={styles.textField}
-                      placeholder={english.firstName}
-                      value={firstName}
-                      onChangeText={handleFname}
-                      editable={false}
-                    />
+                    <View style={styles.parentTexfieldView}>
+                      <Text style={{alignSelf: 'center'}}>
+                        {english.lstName}
+                      </Text>
+                      <TextInput
+                        style={styles.textField}
+                        placeholder={english.lstName}
+                        value={lastName}
+                        onChangeText={handleLname}
+                        editable={false}
+                      />
+                    </View>
                   </View>
 
-                  <View style={styles.parentTexfieldView}>
-                    <Text style={{alignSelf: 'center'}}>{english.lstName}</Text>
-                    <TextInput
-                      style={styles.textField}
-                      placeholder={english.lstName}
-                      value={lastName}
-                      onChangeText={handleLname}
-                      editable={false}
-                    />
+                  <View style={styles.HStackView}>
+                    <View style={styles.parentTexfieldView}>
+                      <Text style={{alignSelf: 'center'}}>
+                        {english.username}
+                      </Text>
+                      <View style={[styles.textField, {flex: 1}]}>
+                        {isLoading ? (
+                          <ActivityIndicator
+                            size="small"
+                            color="black"
+                            style={{marginRight: 10, flex: 1}}
+                          />
+                        ) : (
+                          <TextInput
+                            style={{flex: 1}}
+                            placeholder={english.username}
+                            onChangeText={handleUsername}
+                            value={username}
+                            editable={true}
+                          />
+                        )}
+                        <TouchableOpacity
+                          onPress={() => generateRandomUsername()}
+                          style={styles.penImageTouchableOpacity}>
+                          <Image
+                            style={styles.penImage}
+                            source={require('../../asset/pen.png')}
+                          />
+                        </TouchableOpacity>
+                      </View>
+                    </View>
                   </View>
-                </View>
 
-                <View style={styles.HStackView}>
-                  <View style={styles.parentTexfieldView}>
-                    <Text style={{alignSelf: 'center'}}>
-                      {english.username}
-                    </Text>
-                    <View style={[styles.textField, {flex: 1}]}>
-                      {isLoading ? (
-                        <ActivityIndicator
-                          size="small"
-                          color="black"
-                          style={{marginRight: 10, flex: 1}}
-                        />
-                      ) : (
-                        <TextInput
-                          style={{flex: 1}}
-                          placeholder={english.username}
-                          onChangeText={handleUsername}
-                          value={username}
-                          editable={true}
-                        />
-                      )}
+                  <View style={styles.HStackView}>
+                    <View style={styles.parentTexfieldView}>
+                      <Text style={{alignSelf: 'center'}}>
+                        {english.dobText}
+                      </Text>
                       <TouchableOpacity
-                        onPress={() => generateRandomUsername()}
-                        style={styles.penImageTouchableOpacity}>
-                        <Image
-                          style={styles.penImage}
-                          source={require('../../asset/pen.png')}
-                        />
+                        onPress={() => setOpen(true)}
+                        style={styles.textField}>
+                        <Text
+                          style={{textAlign: 'center', alignSelf: 'center'}}>
+                          {dob}
+                        </Text>
                       </TouchableOpacity>
                     </View>
                   </View>
-                </View>
 
-                <View style={styles.HStackView}>
-                  <View style={styles.parentTexfieldView}>
-                    <Text style={{alignSelf: 'center'}}>{english.dobText}</Text>
-                    <TouchableOpacity
-                      onPress={() => setOpen(true)}
-                      style={styles.textField}>
-                      <Text style={{textAlign: 'center', alignSelf: 'center'}}>
-                        {dob}
+                  <View style={styles.HStackView}>
+                    <View style={[styles.parentTexfieldView, {flex: 1}]}>
+                      <Text style={{alignSelf: 'center', color: 'transparent'}}>
+                        V
                       </Text>
-                    </TouchableOpacity>
-                  </View>
-                </View>
+                      <TouchableOpacity style={styles.textField}>
+                        <Text
+                          style={{
+                            flex: 1,
+                            alignSelf: 'center',
+                          }}>
+                          +1
+                        </Text>
+                        <Image
+                          style={{
+                            width: 20,
+                            height: 25,
+                            flex: 1,
+                            marginLeft: 10,
+                            tintColor: Color.themeOrangeColor,
+                          }}
+                          source={require('../../asset/arrowDown.png')}
+                        />
+                      </TouchableOpacity>
+                    </View>
 
-                <View style={styles.HStackView}>
-                  <View style={[styles.parentTexfieldView, {flex: 1}]}>
-                    <Text style={{alignSelf: 'center', color: 'transparent'}}>
-                      V
-                    </Text>
-                    <TouchableOpacity style={styles.textField}>
-                      <Text
-                        style={{
-                          flex: 1,
-                          alignSelf: 'center',
-                        }}>
-                        +1
+                    <View style={[styles.parentTexfieldView, {flex: 2}]}>
+                      <Text style={{alignSelf: 'center'}}>
+                        Verify Mobile Number
                       </Text>
-                      <Image
-                        style={{
-                          width: 20,
-                          height: 25,
-                          flex: 1,
-                          marginLeft: 10,
-                          tintColor: Color.themeOrangeColor,
-                        }}
-                        source={require('../../asset/arrowDown.png')}
+                      <TextInput
+                        style={styles.textField}
+                        placeholder={english.number}
+                        value={number}
+                        onChangeText={handleNumber}
                       />
-                    </TouchableOpacity>
-                  </View>
-
-                  <View style={[styles.parentTexfieldView, {flex: 2}]}>
-                    <Text style={{alignSelf: 'center'}}>
-                      Verify Mobile Number
-                    </Text>
-                    <TextInput
-                      style={styles.textField}
-                      placeholder={english.number}
-                      value={number}
-                      onChangeText={handleNumber}
-                    />
+                    </View>
                   </View>
                 </View>
               </View>
             </View>
+
+            <TouchableOpacity onPress={onSubmit} style={styles.confirmPwd}>
+              <Text style={styles.confirmPwdText}>
+                {english.signUpSubmitBtn}
+              </Text>
+            </TouchableOpacity>
+
+            <DatePicker
+              modal
+              open={open}
+              date={date}
+              mode="date"
+              maximumDate={new Date()}
+              onConfirm={date => {
+                setPicker(true); // check if the picker is open for the first time
+                setOpen(false);
+                setDate(date);
+                const formattedDate = date.toLocaleDateString('en-GB'); // "DD/MM/YYYY" format
+                setDob(formattedDate);
+              }}
+              onCancel={() => {
+                setOpen(false);
+              }}
+            />
           </View>
-
-          <TouchableOpacity onPress={onSubmit} style={styles.confirmPwd}>
-            <Text style={styles.confirmPwdText}>{english.signUpSubmitBtn}</Text>
-          </TouchableOpacity>
-
-          <DatePicker
-            modal
-            open={open}
-            date={date}
-            mode="date"
-            maximumDate={new Date()}
-            onConfirm={date => {
-              setPicker(true); // check if the picker is open for the first time
-              setOpen(false);
-              setDate(date);
-              const formattedDate = date.toLocaleDateString('en-GB'); // "DD/MM/YYYY" format
-              setDob(formattedDate);
-            }}
-            onCancel={() => {
-              setOpen(false);
-            }}
-          />
-        </View>
-      </ScrollView>
+        </ScrollView>
+      )}
     </ScreenWrapper>
   );
 };
@@ -399,6 +381,20 @@ const styles = StyleSheet.create({
   username: {fontSize: 20, color: 'blue', marginVertical: 10},
 
   // logo image
+
+  titleHeading: {
+    color: 'white',
+    fontWeight: '500',
+    fontSize: 25,
+    marginTop: 10,
+  },
+
+  titleHeading2: {
+    color: 'white',
+    fontWeight: '500',
+    fontSize: 25,
+    marginBottom: 20,
+  },
 
   logoImageView: {
     flex: 1,

@@ -34,6 +34,7 @@ import {
 } from '../../../redux/actions';
 import {API_ACTIONS} from '../../../Constant/apiActionTypes';
 import {api_method, api_url} from '../../../Constant/url';
+import {errorString} from '../../../Constant/ErrorString';
 
 type SignInProps = {
   navigation: StackNavigationProp<any, typeof NavigationStrings.SIGNIN>;
@@ -57,15 +58,10 @@ const SigninFormScreen: React.FC<SignInProps> = ({navigation}) => {
   // ░▒▓████████████████████████ FORM SUBMISSION █████████████████████████▓▒░
 
   const submit = () => {
-    if (email == '') {
-      toaster('Email is missing');
-    } else if (password == '') {
-      toaster('Password is missing');
-    } else if (password.length <= 5) {
-      toaster('Password must be 6 characters long');
-    } else {
-      SignInFirebase(email, password);
-    }
+    if (!email) return toaster(errorString.emailMissing);
+    if (!password) return toaster(errorString.passwordMissing);
+    if (password.length <= 5) return toaster(errorString.passwordLengthExceed);
+    SignInFirebase(email, password);
   };
 
   const signInApi = (idToken: string) => {
