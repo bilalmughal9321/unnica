@@ -134,7 +134,7 @@ const SocialSignupScreen: React.FC<SocialSignupProps> = ({navigation}) => {
       const {identityToken, nonce, fullName, email} = appleAuthRequestResponse;
 
       if (!identityToken) {
-        throw new Error('Apple Sign-In failed: No identity token returned');
+        throw new Error('Apple Sign-In failed: No identity token returneds');
       }
 
       console.log(appleAuthRequestResponse.fullName?.familyName);
