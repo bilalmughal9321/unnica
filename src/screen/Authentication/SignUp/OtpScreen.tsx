@@ -381,7 +381,7 @@ const OtpScreen: React.FC<OtpProps> = ({navigation, route}) => {
     route.params || {};
 
   const dispatch = useDispatch<AppDispatch>();
-  const {load, data} = useSelector((state: RootState) => state.Unnica);
+  const {load, data, err} = useSelector((state: RootState) => state.Unnica);
 
   const storage = new MMKV();
 
@@ -461,6 +461,38 @@ const OtpScreen: React.FC<OtpProps> = ({navigation, route}) => {
       });
     }
   }, [data.SIGNUP]);
+
+  useEffect(() => {
+    if (err.SEND_OTP) {
+      console.log('Error: ', err.SEND_OTP);
+
+      //SMS_OTP_TOO_MANY_TRIES_ERROR
+    }
+  }, [err.SEND_OTP]);
+
+  useEffect(() => {
+    if (err.SIGNUP) {
+      console.log;
+      if (err.SIGNUP.msg != null) {
+        switch (err.SIGNUP.msg) {
+          case 'SMS_OTP_TOO_MANY_TRIES_ERROR':
+            toaster('You tried many times, try again later!');
+            break;
+
+          case 'SMS_OTP_INVALID_ERROR':
+            toaster('You tried many times, try again later!');
+            break;
+
+          case '(otp: must not be blank)':
+            toaster('OTP not be blank');
+            break;
+
+          default:
+            break;
+        }
+      }
+    }
+  }, [err.SIGNUP]);
 
   useEffect(() => {
     if (getSocialToken != undefined) return;
@@ -543,7 +575,7 @@ const OtpScreen: React.FC<OtpProps> = ({navigation, route}) => {
 
   const otpHandling = (phone: string) => {
     if (!phone) return;
-    toaster('Get OTP');
+    // toaster('Get OTP');
     dispatch(
       fetchApiData(
         API_ACTIONS.SEND_OTP,
@@ -552,19 +584,19 @@ const OtpScreen: React.FC<OtpProps> = ({navigation, route}) => {
         {phone},
       ),
     );
-    const timer = setTimeout(() => {
-      toaster('Verify OTP');
-      dispatch(
-        fetchApiData(
-          API_ACTIONS.VERIFY_OTP,
-          `http://api.ci.unnica-dev.co/admin/otp?phone=${encodeURIComponent(
-            phone,
-          )}`,
-          'GET',
-        ),
-      );
-    }, 5000);
-    return () => clearTimeout(timer);
+    // const timer = setTimeout(() => {
+    //   toaster('Verify OTP');
+    //   dispatch(
+    //     fetchApiData(
+    //       API_ACTIONS.VERIFY_OTP,
+    //       `http://api.ci.unnica-dev.co/admin/otp?phone=${encodeURIComponent(
+    //         phone,
+    //       )}`,
+    //       'GET',
+    //     ),
+    //   );
+    // }, 5000);
+    // return () => clearTimeout(timer);
   };
 
   const handleCompleteOtp = (otpArray: Array<string>, token: string | null) => {
@@ -637,7 +669,7 @@ const OtpScreen: React.FC<OtpProps> = ({navigation, route}) => {
                     key={index}
                     ref={ref => (inputRefs.current[index] = ref)}
                     style={styles.input}
-                    keyboardType="numeric"
+                    // keyboardType="numeric"
                     maxLength={1}
                     value={value}
                     onChangeText={text => handleChange(text, index)}
@@ -650,7 +682,7 @@ const OtpScreen: React.FC<OtpProps> = ({navigation, route}) => {
               <TouchableOpacity onPress={() => otpHandling(phoneNumber)}>
                 <Text style={styles.resendText}>
                   Did not receive OTP Code?{' '}
-                  <Text style={styles.resendText2}>Resend code</Text>
+                  <Text style={styles.resendText2}>Resend code (60)</Text>
                 </Text>
               </TouchableOpacity>
             </View>

@@ -147,9 +147,9 @@ const unnicaReducer = (state = startState, action: any) => {
 
   switch (action.type) {
     case request.API_REQUEST:
-      console.log('');
-      console.log('🟡🟡🟡🟡🟡🟡🟡🟡');
-      console.log('State:', apiType);
+      console.info('');
+      console.info('🟡🟡🟡🟡🟡🟡🟡🟡');
+      console.info('State:', apiType);
       const newState = {
         ...state,
         load: true,
@@ -158,10 +158,10 @@ const unnicaReducer = (state = startState, action: any) => {
       return newState;
 
     case request.API_SUCCESS:
-      console.log('');
-      console.log('🟢🟢🟢🟢🟢🟢🟢🟢');
-      console.log('State:', apiType);
-      console.log('Before Update:', state.data);
+      console.info('');
+      console.info('🟢🟢🟢🟢🟢🟢🟢🟢');
+      console.info('State:', apiType);
+      console.info('Before Update:', state.data);
 
       const newState3 = {
         ...state,
@@ -175,10 +175,10 @@ const unnicaReducer = (state = startState, action: any) => {
       return newState3;
 
     case request.API_FAILURE:
-      console.log('');
-      console.log('🔴🔴🔴🔴🔴🔴🔴🔴');
-      console.log('State:', apiType);
-      console.log('Before Update:', state.data);
+      console.info('');
+      console.info('🔴🔴🔴🔴🔴🔴🔴🔴');
+      console.info('State:', apiType);
+      console.info('Before Update:', state.data);
 
       const newState2 = {
         ...state,
@@ -186,17 +186,17 @@ const unnicaReducer = (state = startState, action: any) => {
         err: {...state.err, [apiType]: error},
       };
 
-      console.log('After:', newState2.err);
-      console.log('');
+      console.info('After:', newState2.err);
+      console.info('');
 
       return newState2;
 
     case request.API_RESET:
-      console.log('');
-      console.log('🔵🔵🔵🔵RESET🔵🔵🔵🔵');
-      console.log('State:', apiType);
-      console.log('Before Update Data:', state.data);
-      console.log('Before Update Err:', state.err);
+      console.info('');
+      console.info('🔵🔵🔵🔵RESET🔵🔵🔵🔵');
+      console.info('State:', apiType);
+      console.info('Before Update Data:', state.data);
+      console.info('Before Update Err:', state.err);
 
       const newState4 = {
         ...state,
@@ -205,8 +205,8 @@ const unnicaReducer = (state = startState, action: any) => {
         err: {VERIFY_OTP: null, SIGNUP: null, SEND_OTP: null, SIGNIN: null},
       };
 
-      console.log('After data:', newState4.data);
-      console.log('After Error:', newState4.err);
+      console.info('After data:', newState4.data);
+      console.info('After Error:', newState4.err);
 
       return newState4;
 
@@ -218,21 +218,21 @@ const unnicaReducer = (state = startState, action: any) => {
         load: true,
       };
 
-      console.log('🟣🟣🟣🟣🟣🟣🟣🟣');
-      console.log('After data:', newState5);
+      console.info('🟣🟣🟣🟣🟣🟣🟣🟣');
+      console.info('After data:', newState5);
 
       return newState5;
 
     case request.LOADER_END_REQUEST:
-      console.log('🟣🟣🟣🟣🟣🟣🟣🟣');
-      console.log('before data:', state);
+      console.info('🟣🟣🟣🟣🟣🟣🟣🟣');
+      console.info('before data:', state);
       const newState6 = {
         ...state,
         load: false,
       };
 
-      console.log('🟣🟣🟣🟣🟣🟣🟣🟣');
-      console.log('After data:', newState6);
+      console.info('🟣🟣🟣🟣🟣🟣🟣🟣');
+      console.info('After data:', newState6);
 
       return newState6;
 

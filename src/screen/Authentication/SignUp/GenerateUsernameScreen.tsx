@@ -49,7 +49,7 @@ const GenerateUsernameScreen: React.FC<GeneratedUsernameProps> = ({
   const [username, setUsername] = useState('');
   const [number, setNumber] = useState('');
   const [dob, setDob] = useState('Date of birth');
-  const [code, setCode] = useState('+1');
+  const [code, setCode] = useState('+55');
   const [date, setDate] = useState(new Date());
   const [Picker, setPicker] = useState(false);
   const [open, setOpen] = useState(false);
@@ -170,9 +170,9 @@ const GenerateUsernameScreen: React.FC<GeneratedUsernameProps> = ({
 
     const fullNumber = `${code}${number}`;
 
-    if (!isValidUSPhoneNumber(fullNumber)) {
-      return toaster(errorString.numberWrong);
-    }
+    // if (!isValidUSPhoneNumber(fullNumber)) {
+    //   return toaster(errorString.numberWrong);
+    // }
 
     const userData: any = {
       firstName,
@@ -386,7 +386,7 @@ const GenerateUsernameScreen: React.FC<GeneratedUsernameProps> = ({
                               flex: 1,
                               alignSelf: 'center',
                             }}>
-                            +1
+                            {code}
                           </Text>
                           <Image
                             style={{

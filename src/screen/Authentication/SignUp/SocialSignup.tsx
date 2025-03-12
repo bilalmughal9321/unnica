@@ -123,8 +123,8 @@ const SocialSignupScreen: React.FC<SocialSignupProps> = ({navigation}) => {
         throw new Error('Apple Sign-In failed: No identity token returneds');
       }
 
-      console.log(appleAuthRequestResponse.fullName?.familyName);
-      console.log(appleAuthRequestResponse.fullName?.givenName);
+      // console.log(appleAuthRequestResponse.fullName?.familyName);
+      // console.log(appleAuthRequestResponse.fullName?.givenName);
 
       // get current authentication state for user
       // /!\ This method must be tested on a real device. On the iOS simulator it always throws an error.
@@ -141,32 +141,48 @@ const SocialSignupScreen: React.FC<SocialSignupProps> = ({navigation}) => {
         nonce,
       );
 
-      console.log('appleCredential', appleCredential);
-
       // Step 4: Sign In with Firebase
       const userCredential = await auth().signInWithCredential(appleCredential);
-
-      if (email) {
-        const signInMethods = await auth().fetchSignInMethodsForEmail(email);
-        console.log('signInMethods: ', signInMethods);
-      }
-
-      console.log('Apple Sign-In Success:', userCredential.user);
-
       const firebaseIdToken = await userCredential.user.getIdToken();
-      console.log('Firebase ID Token: ', firebaseIdToken);
+      const isNewUser = userCredential.additionalUserInfo?.isNewUser;
 
-      // use credentialState response to ensure the user is authenticated
-      if (credentialState === appleAuth.State.AUTHORIZED) {
-        // user is authenticated
-        console.log('user is authenticated');
+      if (!isNewUser) {
+        dispatch(startLoader());
+        dispatch(
+          fetchApiData(API_ACTIONS.SIGNIN, api_url.signin, api_method.post, {
+            idToken: firebaseIdToken,
+          }),
+        );
+      } else {
+        let fname = appleAuthRequestResponse.fullName?.givenName;
+        let lname = appleAuthRequestResponse.fullName?.familyName;
+        let emails = appleAuthRequestResponse.email;
+        let username = `${appleAuthRequestResponse.fullName?.givenName}_${appleAuthRequestResponse.fullName?.familyName}_${appleAuthRequestResponse.user}`;
+        let token = firebaseIdToken;
+
+        dispatch(startLoader());
+        setTimeout(() => {
+          dispatch(endLoader());
+
+          navigation.navigate(NavigationStrings.GENERATE_USERNAME, {
+            fn: fname,
+            ln: lname,
+            email: emails,
+            password: token,
+            socialToken: token,
+          });
+        }, 1000);
       }
 
-      // let fname = appleAuthRequestResponse.fullName?.givenName;
-      // let lname = appleAuthRequestResponse.fullName?.familyName;
-      // let emails = appleAuthRequestResponse.email;
-      // let username = `${appleAuthRequestResponse.fullName?.givenName}_${appleAuthRequestResponse.fullName?.familyName}_${appleAuthRequestResponse.user}`;
-      // let token = firebaseIdToken;
+      // console.log('email: ', email);
+      // if (email) {
+      //   const signInMethods = await auth().fetchSignInMethodsForEmail(email);
+      //   console.log('signInMethods: ', signInMethods);
+      // }
+
+      // console.log('Apple Sign-In Success:', userCredential.user);
+
+      // console.log('Firebase ID Token: ', firebaseIdToken);
 
       // console.log('fn: ', fname);
       // console.log('ln', lname);
