@@ -35,6 +35,8 @@ import {
   User,
 } from '@react-native-google-signin/google-signin';
 import {appleAuth} from '@invertase/react-native-apple-authentication';
+import {API_ACTIONS} from '../../../Constant/apiActionTypes';
+import {api_method, api_url} from '../../../Constant/url';
 
 type SocialSignupProps = {
   navigation: StackNavigationProp<any, typeof NavigationStrings.SOCIALSIGNUP>;
@@ -42,13 +44,22 @@ type SocialSignupProps = {
 
 const SocialSignupScreen: React.FC<SocialSignupProps> = ({navigation}) => {
   const dispatch = useDispatch<AppDispatch>();
-  const {load, data} = useSelector((state: RootState) => state.Unnica);
-
-  const storage = new MMKV();
+  const {load, data, err} = useSelector((state: RootState) => state.Unnica);
 
   useEffect(() => {
-    // deleteFirebaseUser();
-  }, []);
+    if (data?.SIGNIN) {
+      console.log(data?.SIGNIN.data);
+      navigation.navigate(NavigationStrings.SIGNUP_SUCCESS, {
+        userData: data?.SIGNIN.data,
+      });
+    }
+  }, [data.SIGNIN]);
+
+  useEffect(() => {
+    if (err?.SIGNIN) {
+      toaster(err.SIGNIN.msg);
+    }
+  }, [err.SIGNIN]);
 
   const googleLogin = async () => {
     GoogleSignin.configure({
@@ -57,7 +68,6 @@ const SocialSignupScreen: React.FC<SocialSignupProps> = ({navigation}) => {
     });
     await GoogleSignin.hasPlayServices();
     const userInfo = await GoogleSignin.signIn();
-    // console.log('userinfo log: ', userInfo.data?.idToken);
 
     if (!userInfo.data?.idToken) {
       throw new Error('Google Sign-In Failed: No ID Token received');
@@ -66,60 +76,36 @@ const SocialSignupScreen: React.FC<SocialSignupProps> = ({navigation}) => {
     const extracted = userInfo.data?.idToken;
     const googleCredential = auth.GoogleAuthProvider.credential(extracted);
     const userCredential = await auth().signInWithCredential(googleCredential);
-    console.log('userCredential: ', userCredential);
-
     const firebaseIdToken = await userCredential.user.getIdToken();
-    console.log('Firebase ID Token: ', firebaseIdToken);
 
-    dispatch(startLoader());
-    setTimeout(() => {
-      let fname = userInfo.data.user.givenName;
-      let lname = userInfo.data?.user.familyName;
-      let email = userInfo.data?.user.email;
-      let token = firebaseIdToken;
+    if (!userCredential.additionalUserInfo?.isNewUser) {
+      dispatch(startLoader());
+      dispatch(
+        fetchApiData(API_ACTIONS.SIGNIN, api_url.signin, api_method.post, {
+          idToken: firebaseIdToken,
+        }),
+      );
+    } else {
+      dispatch(startLoader());
+      setTimeout(() => {
+        let fname = userInfo.data.user.givenName;
+        let lname = userInfo.data?.user.familyName;
+        let email = userInfo.data?.user.email;
+        let token = firebaseIdToken;
 
-      dispatch(endLoader());
+        dispatch(endLoader());
 
-      navigation.navigate(NavigationStrings.GENERATE_USERNAME, {
-        fn: fname,
-        ln: lname,
-        email: email,
-        password: token,
-        socialToken: token,
-      });
-    }, 2000);
-
-    // dispatchApi(fname, lname, email, username, token, isSocial);
-
-    // dispatch(
-    //   fetchApiData(
-    //     'SIGNUP',
-    //     `http://api.ci.unnica-dev.co/user/signup?p=1`,
-    //     'POST',
-    //     {
-    //       firstName: fname,
-    //       lastName: lname,
-    //       email: email,
-    //       username: username,
-    //       idToken: token,
-    //       isSocial: isSocial,
-    //     },
-    //   ),
-    // );
+        navigation.navigate(NavigationStrings.GENERATE_USERNAME, {
+          fn: fname,
+          ln: lname,
+          email: email,
+          password: token,
+          socialToken: token,
+        });
+      }, 1000);
+    }
 
     return userInfo;
-  };
-
-  const deleteFirebaseUser = async () => {
-    try {
-      const user = auth().currentUser;
-      if (user) {
-        await user.delete();
-        console.log('✅ User deleted successfully!');
-      }
-    } catch (error) {
-      console.error('Error deleting user:', error);
-    }
   };
 
   async function onAppleButtonPress() {
@@ -160,6 +146,11 @@ const SocialSignupScreen: React.FC<SocialSignupProps> = ({navigation}) => {
       // Step 4: Sign In with Firebase
       const userCredential = await auth().signInWithCredential(appleCredential);
 
+      if (email) {
+        const signInMethods = await auth().fetchSignInMethodsForEmail(email);
+        console.log('signInMethods: ', signInMethods);
+      }
+
       console.log('Apple Sign-In Success:', userCredential.user);
 
       const firebaseIdToken = await userCredential.user.getIdToken();
@@ -171,49 +162,29 @@ const SocialSignupScreen: React.FC<SocialSignupProps> = ({navigation}) => {
         console.log('user is authenticated');
       }
 
-      let fname = appleAuthRequestResponse.fullName?.givenName;
-      let lname = appleAuthRequestResponse.fullName?.familyName;
-      let emails = appleAuthRequestResponse.email;
-      let username = `${appleAuthRequestResponse.fullName?.givenName}_${appleAuthRequestResponse.fullName?.familyName}_${appleAuthRequestResponse.user}`;
-      let token = firebaseIdToken;
+      // let fname = appleAuthRequestResponse.fullName?.givenName;
+      // let lname = appleAuthRequestResponse.fullName?.familyName;
+      // let emails = appleAuthRequestResponse.email;
+      // let username = `${appleAuthRequestResponse.fullName?.givenName}_${appleAuthRequestResponse.fullName?.familyName}_${appleAuthRequestResponse.user}`;
+      // let token = firebaseIdToken;
 
-      console.log('fn: ', fname);
-      console.log('ln', lname);
-      console.log('email', emails);
-      console.log('token: ', token);
+      // console.log('fn: ', fname);
+      // console.log('ln', lname);
+      // console.log('email', emails);
+      // console.log('token: ', token);
 
-      dispatch(startLoader());
-      setTimeout(() => {
-        dispatch(endLoader());
-
-        navigation.navigate(NavigationStrings.GENERATE_USERNAME, {
-          fn: fname,
-          ln: lname,
-          email: emails,
-          password: token,
-          socialToken: token,
-        });
-      }, 1000);
-
-      // let isSocial = true;
-
+      // dispatch(startLoader());
       // setTimeout(() => {
-      //   dispatch(
-      //     fetchApiData(
-      //       'SIGNUP',
-      //       `http://api.ci.unnica-dev.co/user/signup?p=1`,
-      //       'POST',
-      //       {
-      //         firstName: fname,
-      //         lastName: lname,
-      //         email: email,
-      //         username: username,
-      //         idToken: token,
-      //         isSocial: isSocial,
-      //       },
-      //     ),
-      //   );
-      // }, 3000);
+      //   dispatch(endLoader());
+
+      //   navigation.navigate(NavigationStrings.GENERATE_USERNAME, {
+      //     fn: fname,
+      //     ln: lname,
+      //     email: emails,
+      //     password: token,
+      //     socialToken: token,
+      //   });
+      // }, 1000);
     } catch (error) {
       console.error('❌ Apple Sign-In Error:', error);
     }

@@ -20,7 +20,7 @@ import {english} from '../../../localization/english';
 import DatePicker from 'react-native-date-picker';
 import {RouteProp} from '@react-navigation/native';
 import {text} from 'stream/consumers';
-import {isValidUSPhoneNumber, toaster} from '../../../Utils';
+import {dateFormateUS, isValidUSPhoneNumber, toaster} from '../../../Utils';
 import {MMKV} from 'react-native-mmkv';
 import {useSelector, useDispatch} from 'react-redux';
 import {AppDispatch, RootState} from '../../../redux/store';
@@ -28,6 +28,7 @@ import {apiReset, fetchApiData, startLoader} from '../../../redux/actions';
 import {API_ACTIONS} from '../../../Constant/apiActionTypes';
 import {api_method, api_url} from '../../../Constant/url';
 import {errorString} from '../../../Constant/ErrorString';
+import {opacity} from 'react-native-reanimated/lib/typescript/Colors';
 
 type GeneratedUsernameProps = {
   navigation: StackNavigationProp<
@@ -56,6 +57,8 @@ const GenerateUsernameScreen: React.FC<GeneratedUsernameProps> = ({
   const [image, setImage] = useState(false);
   const [social, setSocial] = useState(false);
   const [getSocialToken, setSocialToken] = useState();
+  const [showEmail, setShowEmail] = useState(false);
+  const [getEmail, setEmail] = useState('');
   const storage = new MMKV();
 
   // ░▒▓████████████████████████ NAVIGATION & REDUX █████████████████████████▓▒░
@@ -70,22 +73,14 @@ const GenerateUsernameScreen: React.FC<GeneratedUsernameProps> = ({
       setImage(false);
     }, 3000);
 
-    // console.log('fn: ', fn);
-    // console.log('ln: ', ln);
-    // console.log('email: ', email);
-    // console.log('pwd: ', password);
-
     setFirstName(fn);
     setLastName(ln);
     generateRandomUsername();
     setSocialToken(socialToken);
-    // if (fromSocial == undefined || fromSocial == null || fromSocial == false) {
-    //   setSocial(false);
-    // } else {
-    //   setSocial(true);
-    // }
-
-    console.log('otp response: ', route.params);
+    setShowEmail(socialToken == undefined ? false : true);
+    if (socialToken != undefined) {
+      setEmail(email);
+    }
   }, []);
 
   useEffect(() => {
@@ -120,7 +115,7 @@ const GenerateUsernameScreen: React.FC<GeneratedUsernameProps> = ({
         fullNumber,
       };
 
-      // dispatch(apiReset(API_ACTIONS.SIGNUP));
+      dispatch(apiReset(API_ACTIONS.SIGNUP));
 
       storage.set('USER_DATA', JSON.stringify(userData));
       storage.set('Step', 2);
@@ -141,7 +136,7 @@ const GenerateUsernameScreen: React.FC<GeneratedUsernameProps> = ({
   useEffect(() => {
     if (err.SIGNUP) {
       toaster(err.SIGNUP.msg);
-      // dispatch(apiReset(API_ACTIONS.SIGNUP));
+      dispatch(apiReset(API_ACTIONS.SIGNUP));
     }
   }, [err.SIGNUP]);
 
@@ -158,26 +153,6 @@ const GenerateUsernameScreen: React.FC<GeneratedUsernameProps> = ({
       }, 1000);
     }
   }, [firstName, lastName]);
-
-  const getFormattedDate = (date: Date) => {
-    const day = date.getDate();
-    const month = date.toLocaleString('en-US', {month: 'short'});
-    const year = date.getFullYear();
-
-    const getDaySuffix = (day: number) => {
-      if (day > 3 && day < 21) return 'th';
-      const lastDigit = day % 10;
-      return lastDigit === 1
-        ? 'st'
-        : lastDigit === 2
-        ? 'nd'
-        : lastDigit === 3
-        ? 'rd'
-        : 'th';
-    };
-
-    return `${day}${getDaySuffix(day)} ${month}, ${year}`;
-  };
 
   // ░▒▓████████████████████████ FORM HANDLERS █████████████████████████▓▒░
 
@@ -228,170 +203,260 @@ const GenerateUsernameScreen: React.FC<GeneratedUsernameProps> = ({
 
   return (
     <ScreenWrapper isBackground={true}>
-      {/* {isLoggedIn ? <UserNameView /> : <ImageLogo />} */}
-      <ScrollView style={styles.container}>
-        <View style={styles.container2}>
-          <Text
-            style={{
-              color: 'white',
-              fontWeight: '500',
-              fontSize: 25,
-              marginTop: 10,
-            }}>
-            <Text style={{fontSize: 40}}>Wait!</Text> Almost Done...
-          </Text>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={styles.container}>
+        <ScrollView style={styles.container}>
+          <View style={styles.container2}>
+            <Text
+              style={{
+                color: 'white',
+                fontWeight: '500',
+                fontSize: 25,
+                marginTop: 10,
+              }}>
+              <Text style={{fontSize: 40}}>Wait!</Text> Almost Done...
+            </Text>
 
-          <Text
-            style={{
-              color: 'white',
-              fontWeight: '500',
-              fontSize: 25,
-              marginBottom: 20,
-            }}>
-            Please verify and complete
-          </Text>
+            <Text
+              style={{
+                color: 'white',
+                fontWeight: '500',
+                fontSize: 25,
+                marginBottom: 20,
+              }}>
+              Please verify and complete
+            </Text>
 
-          <View style={styles.box}>
-            <View style={{padding: 5}}>
-              {/* VStack */}
-              <View style={styles.VStackView}>
-                <View style={styles.HStackView}>
-                  <View style={styles.parentTexfieldView}>
-                    <Text style={{alignSelf: 'center'}}>
-                      {english.firstName}
-                    </Text>
-                    <TextInput
-                      style={styles.textField}
-                      placeholder={english.firstName}
-                      value={firstName}
-                      onChangeText={handleFname}
-                      editable={false}
-                    />
+            <View style={styles.box}>
+              <View style={{padding: 5}}>
+                {/* VStack */}
+                <View style={styles.VStackView}>
+                  <View style={styles.HStackView}>
+                    <View style={styles.parentTexfieldView}>
+                      <Text
+                        style={{
+                          alignSelf: 'center',
+                          fontWeight: '600',
+                          paddingBottom: 4,
+                        }}>
+                        {english.firstName}
+                      </Text>
+                      <TextInput
+                        style={styles.textField}
+                        placeholder={english.firstName}
+                        value={firstName}
+                        onChangeText={handleFname}
+                        editable={true}
+                      />
+                    </View>
+
+                    <View style={styles.parentTexfieldView}>
+                      <Text
+                        style={{
+                          alignSelf: 'center',
+                          fontWeight: '600',
+                          paddingBottom: 4,
+                        }}>
+                        {english.lstName}
+                      </Text>
+                      <TextInput
+                        style={styles.textField}
+                        placeholder={english.lstName}
+                        value={lastName}
+                        onChangeText={handleLname}
+                        editable={true}
+                      />
+                    </View>
                   </View>
 
-                  <View style={styles.parentTexfieldView}>
-                    <Text style={{alignSelf: 'center'}}>{english.lstName}</Text>
-                    <TextInput
-                      style={styles.textField}
-                      placeholder={english.lstName}
-                      value={lastName}
-                      onChangeText={handleLname}
-                      editable={false}
-                    />
-                  </View>
-                </View>
-
-                <View style={styles.HStackView}>
-                  <View style={styles.parentTexfieldView}>
-                    <Text style={{alignSelf: 'center'}}>
-                      {english.username}
-                    </Text>
-                    <View style={[styles.textField, {flex: 1}]}>
-                      {isLoading ? (
-                        <ActivityIndicator
-                          size="small"
-                          color="black"
-                          style={{marginRight: 10, flex: 1}}
-                        />
-                      ) : (
+                  {getEmail != '' ? (
+                    <View style={styles.HStackView}>
+                      <View style={styles.parentTexfieldView}>
+                        <Text
+                          style={{
+                            alignSelf: 'center',
+                            fontWeight: '600',
+                            paddingBottom: 4,
+                          }}>
+                          {english.email}
+                        </Text>
                         <TextInput
-                          style={{flex: 1}}
-                          placeholder={english.username}
-                          onChangeText={handleUsername}
-                          value={username}
-                          editable={true}
+                          style={[styles.textField, {color: '#807d7d'}]}
+                          placeholder={english.email}
+                          value={getEmail}
+                          editable={false}
                         />
-                      )}
+                      </View>
+                    </View>
+                  ) : null}
+
+                  <View style={styles.HStackView}>
+                    <View style={styles.parentTexfieldView}>
+                      <Text
+                        style={{
+                          alignSelf: 'center',
+                          fontWeight: '600',
+                          paddingBottom: 4,
+                        }}>
+                        {english.username}
+                      </Text>
+                      <View style={[styles.textField, {flex: 1}]}>
+                        {isLoading ? (
+                          <ActivityIndicator
+                            size="small"
+                            color="black"
+                            style={{marginRight: 10, flex: 1}}
+                          />
+                        ) : (
+                          <TextInput
+                            style={{flex: 1}}
+                            placeholder={english.username}
+                            onChangeText={handleUsername}
+                            value={username}
+                            editable={true}
+                          />
+                        )}
+                        <TouchableOpacity
+                          onPress={() => generateRandomUsername()}
+                          style={styles.penImageTouchableOpacity}>
+                          <Image
+                            style={styles.penImage}
+                            source={require('../../../asset/pen.png')}
+                          />
+                        </TouchableOpacity>
+                      </View>
+                    </View>
+                  </View>
+
+                  <View style={styles.HStackView}>
+                    <View style={styles.parentTexfieldView}>
+                      <Text
+                        style={{
+                          alignSelf: 'center',
+                          fontWeight: '600',
+                          paddingBottom: 4,
+                        }}>
+                        {english.dobText}
+                      </Text>
                       <TouchableOpacity
-                        onPress={() => generateRandomUsername()}
-                        style={styles.penImageTouchableOpacity}>
-                        <Image
-                          style={styles.penImage}
-                          source={require('../../../asset/pen.png')}
-                        />
+                        onPress={() => setOpen(true)}
+                        style={styles.textField}>
+                        <Text
+                          style={{
+                            textAlign: 'center',
+                            alignSelf: 'center',
+                          }}>
+                          {dob}
+                        </Text>
                       </TouchableOpacity>
                     </View>
                   </View>
-                </View>
 
-                <View style={styles.HStackView}>
-                  <View style={styles.parentTexfieldView}>
-                    <Text style={{alignSelf: 'center'}}>{english.dobText}</Text>
-                    <TouchableOpacity
-                      onPress={() => setOpen(true)}
-                      style={styles.textField}>
-                      <Text style={{textAlign: 'center', alignSelf: 'center'}}>
-                        {dob}
-                      </Text>
-                    </TouchableOpacity>
-                  </View>
-                </View>
-
-                <View style={styles.HStackView}>
-                  <View style={[styles.parentTexfieldView, {flex: 1}]}>
-                    <Text style={{alignSelf: 'center', color: 'transparent'}}>
-                      V
-                    </Text>
-                    <TouchableOpacity style={styles.textField}>
-                      <Text
-                        style={{
-                          flex: 1,
-                          alignSelf: 'center',
-                        }}>
-                        +1
-                      </Text>
-                      <Image
-                        style={{
-                          width: 20,
-                          height: 25,
-                          flex: 1,
-                          marginLeft: 10,
-                          tintColor: Color.themeOrangeColor,
-                        }}
-                        source={require('../../../asset/arrowDown.png')}
-                      />
-                    </TouchableOpacity>
-                  </View>
-
-                  <View style={[styles.parentTexfieldView, {flex: 2}]}>
-                    <Text style={{alignSelf: 'center'}}>
+                  <View
+                    style={{
+                      flexDirection: 'column',
+                      justifyContent: 'center',
+                      // gap: 10,
+                      height: 70,
+                    }}>
+                    <Text
+                      style={{
+                        alignSelf: 'center',
+                        fontWeight: '600',
+                        paddingBottom: 4,
+                        height: 20,
+                      }}>
                       Verify Mobile Number
                     </Text>
-                    <TextInput
-                      style={styles.textField}
-                      placeholder={english.number}
-                      value={number}
-                      onChangeText={handleNumber}
-                    />
+
+                    <View style={[styles.HStackView, {height: 50}]}>
+                      <View style={[styles.parentTexfieldView, {flex: 1}]}>
+                        {/* <Text
+                        style={{
+                          alignSelf: 'center',
+                          color: 'transparent',
+                          paddingBottom: 4,
+                        }}>
+                        V
+                      </Text> */}
+                        <TouchableOpacity style={styles.textField}>
+                          <Text
+                            style={{
+                              flex: 1,
+                              alignSelf: 'center',
+                            }}>
+                            +1
+                          </Text>
+                          <Image
+                            style={{
+                              width: 20,
+                              height: 25,
+                              flex: 1,
+                              marginLeft: 10,
+                              tintColor: Color.themeOrangeColor,
+                            }}
+                            source={require('../../../asset/arrowDown.png')}
+                          />
+                        </TouchableOpacity>
+                      </View>
+
+                      <View style={[styles.parentTexfieldView, {flex: 2}]}>
+                        {/* <Text
+                        style={{
+                          alignSelf: 'center',
+                          fontWeight: '600',
+                          paddingBottom: 4,
+                        }}>
+                        Verify Mobile Number
+                      </Text> */}
+                        <TextInput
+                          style={styles.textField}
+                          placeholder={english.number}
+                          value={number}
+                          onChangeText={handleNumber}
+                        />
+                      </View>
+                    </View>
                   </View>
                 </View>
               </View>
             </View>
+
+            <TouchableOpacity onPress={onSubmit} style={styles.confirmPwd}>
+              <Text style={styles.confirmPwdText}>
+                {english.signUpSubmitBtn}
+              </Text>
+            </TouchableOpacity>
+
+            <DatePicker
+              modal
+              open={open}
+              date={date}
+              mode="date"
+              maximumDate={
+                new Date(new Date().setFullYear(new Date().getFullYear() - 13))
+              }
+              onConfirm={date => {
+                setPicker(true); // check if the picker is open for the first time
+                setOpen(false);
+                setDate(date);
+                const formattedDate = dateFormateUS(date); // "DD/MM/YYYY" format
+                setDob(formattedDate);
+                console.log('asdasd');
+                console.log(
+                  new Date(
+                    new Date().setFullYear(new Date().getFullYear() - 13),
+                  ),
+                );
+              }}
+              onCancel={() => {
+                setOpen(false);
+              }}
+            />
           </View>
-
-          <TouchableOpacity onPress={onSubmit} style={styles.confirmPwd}>
-            <Text style={styles.confirmPwdText}>{english.signUpSubmitBtn}</Text>
-          </TouchableOpacity>
-
-          <DatePicker
-            modal
-            open={open}
-            date={date}
-            mode="date"
-            maximumDate={new Date()}
-            onConfirm={date => {
-              setPicker(true); // check if the picker is open for the first time
-              setOpen(false);
-              setDate(date);
-              const formattedDate = date.toLocaleDateString('en-GB'); // "DD/MM/YYYY" format
-              setDob(formattedDate);
-            }}
-            onCancel={() => {
-              setOpen(false);
-            }}
-          />
-        </View>
-      </ScrollView>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </ScreenWrapper>
   );
 };
@@ -401,7 +466,7 @@ const styles = StyleSheet.create({
     flex: 1,
     // justifyContent: 'center',
     // alignItems: 'center',
-    padding: 20,
+    padding: 5,
     gap: 10,
   },
 

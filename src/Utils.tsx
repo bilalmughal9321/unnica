@@ -63,3 +63,14 @@ export const formatUSPhoneNumber = (phone: string) => {
 
   return phone.replace(regex, '+1 ($1) $2-$3');
 };
+
+export const dateFormateUS = (date: Date) => {
+  const today = date;
+  const month = String(today.getMonth() + 1).padStart(2, '0'); // Ensure two digits for month
+  const day = String(today.getDate()).padStart(2, '0'); // Ensure two digits for day
+  const year = today.getFullYear();
+
+  const formattedDate = `${month}/${day}/${year}`;
+  console.log(formattedDate); // Output: 03/12/2025
+  return formattedDate;
+};

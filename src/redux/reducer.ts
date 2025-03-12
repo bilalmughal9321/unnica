@@ -186,8 +186,8 @@ const unnicaReducer = (state = startState, action: any) => {
         err: {...state.err, [apiType]: error},
       };
 
-      // console.log('After:', newState2.err);
-      // console.log('');
+      console.log('After:', newState2.err);
+      console.log('');
 
       return newState2;
 

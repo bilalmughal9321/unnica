@@ -14,11 +14,14 @@ type OtpProps = {
 };
 
 const SignUpSuccess: React.FC<OtpProps> = ({navigation, route}) => {
+  const {userData} = route.params || {};
+
   const storage = new MMKV();
 
   useEffect(() => {
     storage.clearAll();
-  });
+    console.log('userData: ', userData);
+  }, []);
 
   return (
     <ScreenWrapper isBackground={true}>
