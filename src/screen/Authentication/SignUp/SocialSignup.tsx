@@ -25,17 +25,16 @@ import Toast from 'react-native-simple-toast';
 import {clearData, toaster} from '../../../Utils';
 import {MMKV} from 'react-native-mmkv';
 import {loader} from '../../../components/Loader';
-import {fetchApiData} from '../../../redux/actions';
+import {firebase} from '@react-native-firebase/auth';
+import {endLoader, fetchApiData, startLoader} from '../../../redux/actions';
+import auth from '@react-native-firebase/auth';
 import {
   GoogleSignin,
   GoogleSigninButton,
   statusCodes,
   User,
 } from '@react-native-google-signin/google-signin';
-import {
-  AppleButton,
-  appleAuth,
-} from '@invertase/react-native-apple-authentication';
+import {appleAuth} from '@invertase/react-native-apple-authentication';
 
 type SocialSignupProps = {
   navigation: StackNavigationProp<any, typeof NavigationStrings.SOCIALSIGNUP>;
@@ -47,7 +46,9 @@ const SocialSignupScreen: React.FC<SocialSignupProps> = ({navigation}) => {
 
   const storage = new MMKV();
 
-  useEffect(() => {});
+  useEffect(() => {
+    // deleteFirebaseUser();
+  }, []);
 
   const googleLogin = async () => {
     GoogleSignin.configure({
@@ -63,52 +64,160 @@ const SocialSignupScreen: React.FC<SocialSignupProps> = ({navigation}) => {
     }
 
     const extracted = userInfo.data?.idToken;
-    // const googleCredential = auth.GoogleAuthProvider.credential(extracted);
-    // const userCredential = await auth().signInWithCredential(googleCredential);
+    const googleCredential = auth.GoogleAuthProvider.credential(extracted);
+    const userCredential = await auth().signInWithCredential(googleCredential);
+    console.log('userCredential: ', userCredential);
 
-    // console.log('user: ', userInfo.data);
+    const firebaseIdToken = await userCredential.user.getIdToken();
+    console.log('Firebase ID Token: ', firebaseIdToken);
 
-    console.log('first name: ', userInfo.data.user.givenName);
-    console.log('last name: ', userInfo.data?.user.familyName);
-    console.log('email: ', userInfo.data?.user.email);
-    console.log(
-      'username: ',
-      `${userInfo.data?.user.name}_${userInfo.data?.user.familyName}_${userInfo.data?.user.id}`,
-    );
-    console.log('dob: ', '');
-    console.log('phone: ');
-    console.log('idToken: ', userInfo.data?.idToken);
-    console.log('isSocial: ', true);
+    dispatch(startLoader());
+    setTimeout(() => {
+      let fname = userInfo.data.user.givenName;
+      let lname = userInfo.data?.user.familyName;
+      let email = userInfo.data?.user.email;
+      let token = firebaseIdToken;
 
-    let fname = userInfo.data.user.givenName;
-    let lname = userInfo.data?.user.familyName;
-    let email = userInfo.data?.user.email;
-    let username = `${userInfo.data?.user.name}_${userInfo.data?.user.familyName}_${userInfo.data?.user.id}`;
-    let token = userInfo.data?.idToken;
-    let isSocial = true;
+      dispatch(endLoader());
+
+      navigation.navigate(NavigationStrings.GENERATE_USERNAME, {
+        fn: fname,
+        ln: lname,
+        email: email,
+        password: token,
+        socialToken: token,
+      });
+    }, 2000);
 
     // dispatchApi(fname, lname, email, username, token, isSocial);
 
-    setTimeout(() => {}, 5000);
-
-    dispatch(
-      fetchApiData(
-        'SIGNUP',
-        `http://api.ci.unnica-dev.co/user/signup?p=1`,
-        'POST',
-        {
-          firstName: fname,
-          lastName: lname,
-          email: email,
-          username: username,
-          idToken: token,
-          isSocial: isSocial,
-        },
-      ),
-    );
+    // dispatch(
+    //   fetchApiData(
+    //     'SIGNUP',
+    //     `http://api.ci.unnica-dev.co/user/signup?p=1`,
+    //     'POST',
+    //     {
+    //       firstName: fname,
+    //       lastName: lname,
+    //       email: email,
+    //       username: username,
+    //       idToken: token,
+    //       isSocial: isSocial,
+    //     },
+    //   ),
+    // );
 
     return userInfo;
   };
+
+  const deleteFirebaseUser = async () => {
+    try {
+      const user = auth().currentUser;
+      if (user) {
+        await user.delete();
+        console.log('✅ User deleted successfully!');
+      }
+    } catch (error) {
+      console.error('Error deleting user:', error);
+    }
+  };
+
+  async function onAppleButtonPress() {
+    try {
+      // performs login request
+      const appleAuthRequestResponse = await appleAuth.performRequest({
+        requestedOperation: appleAuth.Operation.LOGIN,
+        // Note: it appears putting FULL_NAME first is important, see issue #293
+        requestedScopes: [appleAuth.Scope.FULL_NAME, appleAuth.Scope.EMAIL],
+      });
+
+      const {identityToken, nonce, fullName, email} = appleAuthRequestResponse;
+
+      if (!identityToken) {
+        throw new Error('Apple Sign-In failed: No identity token returned');
+      }
+
+      console.log(appleAuthRequestResponse.fullName?.familyName);
+      console.log(appleAuthRequestResponse.fullName?.givenName);
+
+      // get current authentication state for user
+      // /!\ This method must be tested on a real device. On the iOS simulator it always throws an error.
+      const credentialState = await appleAuth.getCredentialStateForUser(
+        appleAuthRequestResponse.user,
+      );
+
+      // console.log('apple token log: ', appleAuthRequestResponse.identityToken);
+      // console.log('apple token log: ', appleAuthRequestResponse);
+
+      // Create Firebase Apple Credential
+      const appleCredential = auth.AppleAuthProvider.credential(
+        identityToken,
+        nonce,
+      );
+
+      console.log('appleCredential', appleCredential);
+
+      // Step 4: Sign In with Firebase
+      const userCredential = await auth().signInWithCredential(appleCredential);
+
+      console.log('Apple Sign-In Success:', userCredential.user);
+
+      const firebaseIdToken = await userCredential.user.getIdToken();
+      console.log('Firebase ID Token: ', firebaseIdToken);
+
+      // use credentialState response to ensure the user is authenticated
+      if (credentialState === appleAuth.State.AUTHORIZED) {
+        // user is authenticated
+        console.log('user is authenticated');
+      }
+
+      let fname = appleAuthRequestResponse.fullName?.givenName;
+      let lname = appleAuthRequestResponse.fullName?.familyName;
+      let emails = appleAuthRequestResponse.email;
+      let username = `${appleAuthRequestResponse.fullName?.givenName}_${appleAuthRequestResponse.fullName?.familyName}_${appleAuthRequestResponse.user}`;
+      let token = firebaseIdToken;
+
+      console.log('fn: ', fname);
+      console.log('ln', lname);
+      console.log('email', emails);
+      console.log('token: ', token);
+
+      dispatch(startLoader());
+      setTimeout(() => {
+        dispatch(endLoader());
+
+        navigation.navigate(NavigationStrings.GENERATE_USERNAME, {
+          fn: fname,
+          ln: lname,
+          email: emails,
+          password: token,
+          socialToken: token,
+        });
+      }, 1000);
+
+      // let isSocial = true;
+
+      // setTimeout(() => {
+      //   dispatch(
+      //     fetchApiData(
+      //       'SIGNUP',
+      //       `http://api.ci.unnica-dev.co/user/signup?p=1`,
+      //       'POST',
+      //       {
+      //         firstName: fname,
+      //         lastName: lname,
+      //         email: email,
+      //         username: username,
+      //         idToken: token,
+      //         isSocial: isSocial,
+      //       },
+      //     ),
+      //   );
+      // }, 3000);
+    } catch (error) {
+      console.error('❌ Apple Sign-In Error:', error);
+    }
+  }
 
   const dispatchApi = (
     fname: string | null,
@@ -128,87 +237,17 @@ const SocialSignupScreen: React.FC<SocialSignupProps> = ({navigation}) => {
 
   useEffect(() => {
     if (data.SIGNUP) {
-      toaster('Account has been created');
+      // toaster('Account has been created');
       navigation.navigate(NavigationStrings.SIGNUP_SUCCESS);
     }
   }, [data.SIGNUP]);
-
-  async function onAppleButtonPress() {
-    try {
-      // performs login request
-      const appleAuthRequestResponse = await appleAuth.performRequest({
-        requestedOperation: appleAuth.Operation.LOGIN,
-        // Note: it appears putting FULL_NAME first is important, see issue #293
-        requestedScopes: [appleAuth.Scope.FULL_NAME, appleAuth.Scope.EMAIL],
-      });
-
-      const {identityToken, nonce} = appleAuthRequestResponse;
-
-      if (!identityToken) {
-        throw new Error('Apple Sign-In failed: No identity token returned');
-      }
-
-      // get current authentication state for user
-      // /!\ This method must be tested on a real device. On the iOS simulator it always throws an error.
-      const credentialState = await appleAuth.getCredentialStateForUser(
-        appleAuthRequestResponse.user,
-      );
-
-      console.log('apple token log: ', appleAuthRequestResponse.identityToken);
-      console.log('apple token log: ', appleAuthRequestResponse);
-
-      let fname = appleAuthRequestResponse.fullName?.givenName;
-      let lname = appleAuthRequestResponse.fullName?.familyName;
-      let email = appleAuthRequestResponse.email;
-      let username = `${appleAuthRequestResponse.fullName?.givenName}_${appleAuthRequestResponse.fullName?.familyName}_${appleAuthRequestResponse.user}`;
-      let token = appleAuthRequestResponse.identityToken;
-      let isSocial = true;
-
-      setTimeout(() => {
-        dispatch(
-          fetchApiData(
-            'SIGNUP',
-            `http://api.ci.unnica-dev.co/user/signup?p=1`,
-            'POST',
-            {
-              firstName: fname,
-              lastName: lname,
-              email: email,
-              username: username,
-              idToken: token,
-              isSocial: isSocial,
-            },
-          ),
-        );
-      }, 3000);
-
-      // Create Firebase Apple Credential
-      // const appleCredential = auth.AppleAuthProvider.credential(
-      //   identityToken,
-      //   nonce,
-      // );
-
-      // Step 4: Sign In with Firebase
-      //   const userCredential = await auth().signInWithCredential(appleCredential);
-
-      //   console.log('Apple Sign-In Success:', userCredential.user);
-
-      // use credentialState response to ensure the user is authenticated
-      if (credentialState === appleAuth.State.AUTHORIZED) {
-        // user is authenticated
-        console.log('user is authenticated');
-      }
-    } catch (error) {
-      console.error('❌ Apple Sign-In Error:', error);
-    }
-  }
 
   const GoogleSignUpButton = () => {
     return (
       <View style={styles.google_container}>
         <TouchableOpacity style={styles.google_button} onPress={googleLogin}>
           <Image
-            source={require('../../asset/google.png')}
+            source={require('../../../asset/google.png')}
             style={styles.google_icon}
           />
           <Text style={styles.google_text}>Continue with Google</Text>
@@ -224,7 +263,7 @@ const SocialSignupScreen: React.FC<SocialSignupProps> = ({navigation}) => {
           style={styles.google_button}
           onPress={onAppleButtonPress}>
           <Image
-            source={require('../../asset/apple.png')}
+            source={require('../../../asset/apple.png')}
             style={styles.google_icon}
           />
           <Text style={styles.google_text}>Continue with Apple</Text>
@@ -245,7 +284,7 @@ const SocialSignupScreen: React.FC<SocialSignupProps> = ({navigation}) => {
           <View style={styles.innerContainer}>
             <Image
               style={styles.titleImage}
-              source={require('../../asset/unnica_logo.png')}
+              source={require('../../../asset/unnica_logo.png')}
             />
 
             <View style={styles.box}>

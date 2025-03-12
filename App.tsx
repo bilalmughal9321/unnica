@@ -46,13 +46,13 @@ import CardListScreen from './src/screen/CardListScreen';
 import PharmacyScreen from './src/screen/PhaarmacyScreen';
 import SplashScreen from './src/screen/SplashScreen';
 import CartScreen from './src/screen/CartListScreen';
-import SignupFormScreen from './src/screen/SignUp/SignupFormScreen';
-import GenerateUsernameScreen from './src/screen/SignUp/GenerateUsernameScreen';
-import OtpScreen from './src/screen/SignUp/OtpScreen';
+import SignupFormScreen from './src/screen/Authentication/SignUp/SignupFormScreen';
+import GenerateUsernameScreen from './src/screen/Authentication/SignUp/GenerateUsernameScreen';
+import OtpScreen from './src/screen/Authentication/SignUp/OtpScreen';
 import NavigationStrings from './src/Constant/NavigationStrings';
 import ScreenWrapper from './src/components/ScreenWrapper';
-import SignUpSuccess from './src/screen/SignUp/signSuccess';
-import SocialSignupScreen from './src/screen/SignUp/SocialSignup';
+import SignUpSuccess from './src/screen/Authentication/SignUp/signSuccess';
+import SocialSignupScreen from './src/screen/Authentication/SignUp/SocialSignup';
 import SigninFormScreen from './src/screen/Authentication/SignIn/SigInFormScreen';
 
 type SectionProps = PropsWithChildren<{

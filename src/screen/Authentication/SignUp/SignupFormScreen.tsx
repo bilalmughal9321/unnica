@@ -67,43 +67,51 @@ const SignupFormScreen: React.FC<SignUpProps> = ({navigation}) => {
     const step = storage.getNumber('Step');
     const userData = storage.getString('USER_DATA');
 
-    if (userData) {
-      const parsedData = JSON.parse(userData);
+    // if (userData) {
+    //   const parsedData = JSON.parse(userData);
 
-      let navigateTo = null;
+    // if (step == 1) {
+    //   let data = storage.getString('USER_DATA');
+    //   if (data) {
+    //     console.log('saved value: ', JSON.parse(data));
+    //     let value = JSON.parse(data);
 
-      if (step === 1) {
-        navigateTo = {
-          screen: NavigationStrings.GENERATE_USERNAME,
-          params: {
-            fn: parsedData.firstName,
-            ln: parsedData.lastName,
-            email: parsedData.email,
-            password: parsedData.password,
-          },
-        };
-      } else if (step === 2) {
-        navigateTo = {
-          screen: NavigationStrings.OTP,
-          params: {
-            fn: parsedData.firstName,
-            ln: parsedData.lastName,
-            email: parsedData.email,
-            password: parsedData.password,
-            username: parsedData.username,
-            dob: parsedData.dob,
-            number: parsedData.number,
-          },
-        };
-      }
+    //     toaster('sign up process step 1 is already completed.');
 
-      if (navigateTo) {
-        const timer = setTimeout(() => {
-          navigation.navigate(navigateTo.screen, navigateTo.params);
-        }, 3000);
-        return () => clearTimeout(timer);
-      }
-    }
+    //     const timer = setTimeout(() => {
+    //       navigation.navigate(NavigationStrings.GENERATE_USERNAME, {
+    //         fn: value.firstName,
+    //         ln: value.lastName,
+    //         email: value.email,
+    //         password: value.password,
+    //       });
+    //     }, 3000);
+    //     // Clear timeout on component unmount
+    //     return () => clearTimeout(timer);
+    //   }
+    // } else if (step == 2) {
+    //   let data = storage.getString('USER_DATA');
+    //   if (data) {
+    //     console.log('saved value: ', JSON.parse(data));
+    //     let value = JSON.parse(data);
+
+    //     toaster('sign up process step 1 and 2 is already completed.');
+
+    //     const timer = setTimeout(() => {
+    //       navigation.navigate(NavigationStrings.OTP, {
+    //         fn: value.firstName,
+    //         ln: value.lastName,
+    //         email: value.email,
+    //         password: value.password,
+    //         username: value.username,
+    //         dob: value.dob,
+    //         number: value.number,
+    //       });
+    //     }, 3000);
+    //     // Clear timeout on component unmount
+    //     return () => clearTimeout(timer);
+    //   }
+    // }
   }, []);
 
   // ░▒▓████████████████████████ FORM SUBMISSION █████████████████████████▓▒░
@@ -170,7 +178,7 @@ const SignupFormScreen: React.FC<SignUpProps> = ({navigation}) => {
           <View style={styles.innerContainer}>
             <Image
               style={styles.titleImage}
-              source={require('../../asset/unnica_logo.png')}
+              source={require('../../../asset/unnica_logo.png')}
             />
 
             <View style={styles.box}>

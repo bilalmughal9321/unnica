@@ -25,7 +25,7 @@ const SignUpSuccess: React.FC<OtpProps> = ({navigation, route}) => {
       <View style={styles.logoImageView}>
         <Image
           style={styles.logoImage}
-          source={require('../../asset/unnica_logo.png')}
+          source={require('../../../asset/unnica_logo.png')}
         />
         <Text style={styles.welcomeText}>{english.genUsernameWelcome}</Text>
       </View>

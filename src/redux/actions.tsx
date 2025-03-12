@@ -79,6 +79,8 @@ export const fetchApiData = (
 
       const data = await response.json();
 
+      console.log('response: ', data);
+
       if (data.code != undefined && data.code == 200) {
         dispatch(apiSuccess(apiType, data));
       } else {

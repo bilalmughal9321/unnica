@@ -169,8 +169,8 @@ const unnicaReducer = (state = startState, action: any) => {
         data: {...state.data, [apiType]: data},
       };
 
-      console.log('After:', newState3.data);
-      console.log('');
+      // console.log('After:', newState3.data);
+      // console.log('');
 
       return newState3;
 
@@ -186,14 +186,14 @@ const unnicaReducer = (state = startState, action: any) => {
         err: {...state.err, [apiType]: error},
       };
 
-      console.log('After:', newState2.err);
-      console.log('');
+      // console.log('After:', newState2.err);
+      // console.log('');
 
       return newState2;
 
     case request.API_RESET:
       console.log('');
-      console.log('🔵🔵🔵🔵🔵🔵🔵🔵');
+      console.log('🔵🔵🔵🔵RESET🔵🔵🔵🔵');
       console.log('State:', apiType);
       console.log('Before Update Data:', state.data);
       console.log('Before Update Err:', state.err);

@@ -346,12 +346,7 @@ import ScreenWrapper from '../../../components/ScreenWrapper';
 import {MMKV} from 'react-native-mmkv';
 import {useDispatch, useSelector} from 'react-redux';
 import {AppDispatch, RootState} from '../../../redux/store';
-import {
-  apiRequest,
-  endLoader,
-  fetchApiData,
-  startLoader,
-} from '../../../redux/actions';
+import {endLoader, fetchApiData, startLoader} from '../../../redux/actions';
 import {loader} from '../../../components/Loader';
 import {formatUSPhoneNumber, toaster} from '../../../Utils';
 import {API_ACTIONS} from '../../../Constant/apiActionTypes';
@@ -378,7 +373,12 @@ const OtpScreen: React.FC<OtpProps> = ({navigation, route}) => {
   const [getNumber, setNumber] = useState('');
   const [getdob, setDOB] = useState('Click to add dob');
   const [getToken, setToken] = useState('');
+  const [getSocial, setSocial] = useState('');
+  const [getSocialToken, setSocialToken] = useState();
   const [appState, setAppState] = useState(AppState.currentState);
+
+  const {fn, ln, email, password, username, dob, number, socialToken} =
+    route.params || {};
 
   const dispatch = useDispatch<AppDispatch>();
   const {load, data} = useSelector((state: RootState) => state.Unnica);
@@ -386,31 +386,51 @@ const OtpScreen: React.FC<OtpProps> = ({navigation, route}) => {
   const storage = new MMKV();
 
   useEffect(() => {
-    let user = storage.getString('USER_DATA');
-    if (user) {
-      let response = JSON.parse(user);
-      const {fn, ln, email, password, username, fullNumber, dob} = response;
+    console.log('otp response screen: ', route.params);
+
+    if (socialToken != undefined) {
       setFn(fn);
       setLn(ln);
       setEmail(email);
       setPwd(password);
       setUser(username);
-      setNumber(fullNumber);
+      setNumber(number);
       setDOB(dob);
-      setPhoneNumber(fullNumber);
-      otpHandling(fullNumber);
-      signUp(email, password);
+      setPhoneNumber(number);
+      otpHandling(number);
+      setSocialToken(socialToken);
+      setToken(socialToken);
+    } else {
+      let user = storage.getString('USER_DATA');
+      console.log(user);
+      if (user) {
+        let response = JSON.parse(user);
+        const {
+          fn,
+          ln,
+          email,
+          password,
+          username,
+          fullNumber,
+          dob,
+          fromSocial,
+          socialToken,
+        } = response;
 
-      let users = {
-        fn: fn,
-        ln: ln,
-        email: email,
-        password: password,
-        username: username,
-        fullNumber: fullNumber,
-        dob: dob,
-      };
-      console.log(users);
+        console.log('otp response screen: ', response);
+
+        setFn(fn);
+        setLn(ln);
+        setEmail(email);
+        setPwd(password);
+        setUser(username);
+        setNumber(fullNumber);
+        setDOB(dob);
+        setPhoneNumber(fullNumber);
+        otpHandling(fullNumber);
+        setSocialToken(socialToken);
+        signUp(email, password);
+      }
     }
   }, []);
 
@@ -443,6 +463,8 @@ const OtpScreen: React.FC<OtpProps> = ({navigation, route}) => {
   }, [data.SIGNUP]);
 
   useEffect(() => {
+    if (getSocialToken != undefined) return;
+
     const subscription = AppState.addEventListener('change', nextAppState => {
       console.log('App State Changed: ', nextAppState);
 
@@ -455,7 +477,9 @@ const OtpScreen: React.FC<OtpProps> = ({navigation, route}) => {
   }, []);
 
   const signUp = async (email: string, password: string) => {
-    dispatch(startLoader());
+    if (getSocialToken != undefined) return;
+
+    // dispatch(startLoader());
     try {
       const userCredential = await auth().createUserWithEmailAndPassword(
         email,
@@ -474,7 +498,9 @@ const OtpScreen: React.FC<OtpProps> = ({navigation, route}) => {
   };
 
   const signInAndDeleteUser = async (email: string, password: string) => {
-    dispatch(startLoader());
+    if (getSocialToken != undefined) return;
+
+    // dispatch(startLoader());
     try {
       const user = await signInUser(email, password); // Step 1: Sign In
       await deleteUser(user); // Step 2: Delete User
@@ -559,22 +585,26 @@ const OtpScreen: React.FC<OtpProps> = ({navigation, route}) => {
     ) {
       toaster('Some required fields are missing');
     } else {
+      const requestBody = {
+        firstName: getFn,
+        lastName: getLn,
+        email: getEmail,
+        username: getUser,
+        dob: getdob,
+        phone: phoneNumber,
+        otp: otp.join(''),
+        idToken: getToken,
+        isSocial: getSocialToken == undefined ? false : true,
+      };
+
+      console.log('request body: ', requestBody);
+
       dispatch(
         fetchApiData(
           'SIGNUP',
           `http://api.ci.unnica-dev.co/user/signup?p=3`,
           'POST',
-          {
-            firstName: getFn,
-            lastName: getLn,
-            email: getEmail,
-            username: getUser,
-            dob: getdob,
-            phone: phoneNumber,
-            otp: otp.join(''),
-            idToken: getToken,
-            isSocial: false,
-          },
+          requestBody,
         ),
       );
     }
