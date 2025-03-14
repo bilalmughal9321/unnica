@@ -556,7 +556,7 @@ const OtpScreen: React.FC<OtpProps> = ({navigation, route}) => {
       throw error;
     }
   };
-
+  // startTimer();
   const deleteUser = async (user: FirebaseAuthTypes.User) => {
     try {
       if (user) {
@@ -653,6 +653,24 @@ const OtpScreen: React.FC<OtpProps> = ({navigation, route}) => {
     }
   };
 
+  const [timer, setTimer] = useState(60);
+  const [isDisabled, setIsDisabled] = useState(false);
+
+  const startTimer = () => {
+    setIsDisabled(true);
+    setTimer(60);
+
+    const interval = setInterval(() => {
+      setTimer(prev => {
+        if (prev === 1) {
+          clearInterval(interval);
+          setIsDisabled(false);
+        }
+        return prev - 1;
+      });
+    }, 1000);
+  };
+
   return (
     <ScreenWrapper isBackground={true}>
       {load && loader()}
@@ -679,10 +697,17 @@ const OtpScreen: React.FC<OtpProps> = ({navigation, route}) => {
               <Text style={styles.infoText}>
                 Verification code sent to {formatUSPhoneNumber(phoneNumber)}
               </Text>
-              <TouchableOpacity onPress={() => otpHandling(phoneNumber)}>
+              <TouchableOpacity
+                onPress={() => otpHandling(phoneNumber)}
+                disabled={isDisabled}>
+                {/* <Text style={styles.resendText}>
+                  Did not receive OTP Code?{' '}
+                  <Text style={styles.resendText2}>Resend code </Text>
+                </Text> */}
                 <Text style={styles.resendText}>
                   Did not receive OTP Code?{' '}
-                  <Text style={styles.resendText2}>Resend code (60)</Text>
+                  {isDisabled && <Text>( {timer} )</Text>}
+                  <Text style={styles.resendText2}> Resend code</Text>
                 </Text>
               </TouchableOpacity>
             </View>
