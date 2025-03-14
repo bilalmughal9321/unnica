@@ -29,6 +29,7 @@ import {API_ACTIONS} from '../../../Constant/apiActionTypes';
 import {api_method, api_url} from '../../../Constant/url';
 import {errorString} from '../../../Constant/ErrorString';
 import {opacity} from 'react-native-reanimated/lib/typescript/Colors';
+import CountryCodePicker from '../../../Constant/CountryCodePicker';
 
 type GeneratedUsernameProps = {
   navigation: StackNavigationProp<
@@ -197,6 +198,21 @@ const GenerateUsernameScreen: React.FC<GeneratedUsernameProps> = ({
         userData,
       ),
     );
+  };
+
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedCountry, setSelectedCountry] = useState(null);
+  const countries = [
+    {name: 'Pakistan', code: '+92'},
+    {name: 'India', code: '+91'},
+    // Add more countries as needed
+  ];
+
+  const handleSelectCountry = (code: any) => {
+    console.log('country: ', code);
+    // setSelectedCountry(country);
+    setCode(code);
+    setModalVisible(false);
   };
 
   // ░▒▓████████████████████████ UI COMPONENT █████████████████████████▓▒░
@@ -380,21 +396,25 @@ const GenerateUsernameScreen: React.FC<GeneratedUsernameProps> = ({
                         }}>
                         V
                       </Text> */}
-                        <TouchableOpacity style={styles.textField}>
+                        <TouchableOpacity
+                          onPress={() => setModalVisible(true)}
+                          style={styles.textField}>
                           <Text
                             style={{
-                              flex: 1,
+                              flex: 2,
                               alignSelf: 'center',
+                              // backgroundColor: 'blue',
                             }}>
                             {code}
                           </Text>
                           <Image
                             style={{
-                              width: 20,
+                              // width: 15,
                               height: 25,
                               flex: 1,
-                              marginLeft: 10,
+                              // marginLeft: 25,
                               tintColor: Color.themeOrangeColor,
+                              // backgroundColor: 'red',
                             }}
                             source={require('../../../asset/arrowDown.png')}
                           />
@@ -453,6 +473,12 @@ const GenerateUsernameScreen: React.FC<GeneratedUsernameProps> = ({
               onCancel={() => {
                 setOpen(false);
               }}
+            />
+
+            <CountryCodePicker
+              visible={modalVisible}
+              onSelect={handleSelectCountry}
+              onClose={() => setModalVisible(false)}
             />
           </View>
         </ScrollView>
